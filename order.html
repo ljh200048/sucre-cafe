@@ -498,10 +498,11 @@
       btn.textContent = '주문 완료 ✓';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
+      console.error('EmailJS error:', JSON.stringify(err));
       const msg = document.getElementById('resultMsg');
       msg.className = 'result-msg error';
       msg.style.display = 'block';
-      msg.textContent = '❌ 전송에 실패했습니다. 잠시 후 다시 시도해주세요.';
+      msg.innerHTML = '❌ 오류: <strong>' + (err.text || err.message || JSON.stringify(err)) + '</strong>';
       btn.disabled = false;
       btn.textContent = '주문 신청하기';
     }
