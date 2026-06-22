@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financier — Sucré</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Cormorant Garamond', serif; color: #1a1a1a; background: #fff; font-size: 15px; line-height: 1.7; }
+
+  /* NAV */
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 40px; border-bottom: 0.5px solid #e0ddd8; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 400; letter-spacing: 0.04em; text-decoration: none; color: #1a1a1a; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { font-size: 13px; color: #666; text-decoration: none; letter-spacing: 0.07em; transition: color 0.15s; }
+  .nav-links a:hover { color: #1a1a1a; }
+  .nav-icons { display: flex; gap: 18px; font-size: 18px; color: #666; cursor: pointer; }
+
+  /* BREADCRUMB */
+  .breadcrumb { padding: 14px 40px; font-size: 12px; color: #aaa; letter-spacing: 0.04em; display: flex; gap: 8px; align-items: center; border-bottom: 0.5px solid #f0ede8; }
+  .breadcrumb a { color: #aaa; text-decoration: none; }
+  .breadcrumb a:hover { color: #1a1a1a; }
+  .breadcrumb .sep { color: #ddd; font-size: 10px; }
+  .breadcrumb .current { color: #1a1a1a; }
+
+  /* PRODUCT LAYOUT */
+  .product-layout { display: grid; grid-template-columns: 1fr 1fr; }
+
+  /* MAIN IMAGE — warm gold, almost architectural */
+  .product-images { display: flex; flex-direction: column; }
+  .main-img {
+    background: linear-gradient(160deg, #1c1408 0%, #3a2c10 35%, #6a4e1c 65%, #9a7430 100%);
+    min-height: 480px; display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  /* subtle grid texture overlay */
+  .main-img::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px),
+                      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px);
+  }
+  .main-img-emoji { font-size: 88px; filter: drop-shadow(0 12px 36px rgba(0,0,0,0.5)); position: relative; z-index: 1; }
+  .main-img-badge { position: absolute; top: 24px; left: 24px; background: rgba(255,255,255,0.08); backdrop-filter: blur(6px); font-size: 10px; letter-spacing: 0.14em; padding: 5px 14px; color: #d4a84a; border: 0.5px solid rgba(212,168,74,0.4); font-family: 'Cormorant Garamond', serif; z-index: 2; }
+  .main-img-year { position: absolute; bottom: 24px; right: 28px; font-family: 'Playfair Display', serif; font-size: 13px; font-style: italic; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; z-index: 2; }
+
+  .thumb-row { display: flex; gap: 10px; padding: 14px 40px; border-bottom: 0.5px solid #e0ddd8; }
+  .thumb { width: 68px; height: 68px; border-radius: 2px; cursor: pointer; border: 0.5px solid #e0ddd8; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: all 0.2s; }
+  .thumb:hover { opacity: 0.8; }
+  .thumb.active { border: 1px solid #9a7430; }
+  .th1 { background: linear-gradient(145deg, #2c2010, #5a4020); }
+  .th2 { background: linear-gradient(145deg, #f5ede0, #e8d4b0); }
+  .th3 { background: linear-gradient(145deg, #e8e0d4, #d0c4a8); }
+
+  /* PRODUCT INFO */
+  .product-info { padding: 44px 44px 36px; border-left: 0.5px solid #e0ddd8; display: flex; flex-direction: column; }
+  .product-category { font-size: 11px; letter-spacing: 0.14em; color: #9a7430; margin-bottom: 10px; }
+  .product-name { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; line-height: 1.3; margin-bottom: 3px; }
+  .product-name-fr { font-family: 'Playfair Display', serif; font-size: 14px; font-style: italic; color: #9a7430; margin-bottom: 5px; letter-spacing: 0.04em; }
+  .product-name-ko { font-size: 13px; color: #bbb; letter-spacing: 0.04em; margin-bottom: 22px; }
+  .product-price { font-size: 24px; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .product-price-note { font-size: 12px; color: #aaa; letter-spacing: 0.02em; margin-bottom: 24px; }
+  .divider { border: none; border-top: 0.5px solid #ece9e4; margin: 18px 0; }
+
+  .option-label { font-size: 11px; letter-spacing: 0.1em; color: #999; margin-bottom: 9px; }
+  .option-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .opt-btn { padding: 7px 16px; border: 0.5px solid #d8d4cc; font-size: 13px; font-family: 'Cormorant Garamond', serif; background: #fff; color: #666; cursor: pointer; letter-spacing: 0.04em; border-radius: 1px; transition: all 0.15s; }
+  .opt-btn:hover { border-color: #999; color: #1a1a1a; }
+  .opt-btn.selected { border: 1px solid #1a1a1a; color: #1a1a1a; background: #faf8f5; }
+
+  /* FLAVOR CARDS — horizontal scroll */
+  .flavor-scroll { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
+  .flavor-card { border: 0.5px solid #e8e4e0; border-radius: 2px; padding: 14px 12px; cursor: pointer; transition: all 0.15s; display: flex; flex-direction: column; gap: 5px; }
+  .flavor-card:hover { border-color: #9a7430; }
+  .flavor-card.selected { border: 1px solid #9a7430; background: #fdf9f2; }
+  .fc-top { display: flex; align-items: center; gap: 8px; }
+  .fc-emoji { font-size: 18px; }
+  .fc-name { font-size: 13px; color: #1a1a1a; letter-spacing: 0.02em; }
+  .flavor-card.selected .fc-name { color: #9a7430; }
+  .fc-note { font-size: 11px; color: #bbb; letter-spacing: 0.02em; }
+
+  .qty-row { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+  .qty-label { font-size: 11px; letter-spacing: 0.1em; color: #999; }
+  .qty-ctrl { display: flex; align-items: center; gap: 14px; border: 0.5px solid #d8d4cc; padding: 6px 14px; }
+  .qty-ctrl button { background: none; border: none; font-size: 18px; cursor: pointer; color: #666; line-height: 1; }
+  .qty-ctrl button:hover { color: #1a1a1a; }
+  .qty-num { font-size: 15px; min-width: 20px; text-align: center; }
+
+  .btn-cart { width: 100%; padding: 14px; background: #1a1a1a; color: #fff; border: none; font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: 0.12em; cursor: pointer; margin-bottom: 9px; transition: background 0.2s; }
+  .btn-cart:hover { background: #333; }
+  .btn-wish { width: 100%; padding: 13px; background: #fff; color: #1a1a1a; border: 0.5px solid #1a1a1a; font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: 0.12em; cursor: pointer; transition: background 0.2s; }
+  .btn-wish:hover { background: #faf8f5; }
+
+  .note-row { display: flex; gap: 9px; font-size: 13px; color: #999; line-height: 1.7; align-items: flex-start; margin-bottom: 5px; letter-spacing: 0.02em; }
+
+  /* HISTOIRE */
+  .histoire-section { padding: 64px 40px 0; border-top: 0.5px solid #e0ddd8; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 23px; font-weight: 400; margin-bottom: 22px; }
+  .section-body { font-size: 15px; color: #666; line-height: 2.1; letter-spacing: 0.02em; max-width: 700px; }
+
+  /* FULL DARK IMG */
+  .full-img-dark {
+    margin: 52px 0 0;
+    background: linear-gradient(150deg, #0e0a04, #2a1e08, #4a3414, #6a4e20);
+    height: 340px; display: flex; align-items: center; justify-content: center;
+    font-size: 72px; position: relative; overflow: hidden;
+  }
+  .full-img-dark::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 24px, rgba(255,255,255,0.015) 24px, rgba(255,255,255,0.015) 25px);
+  }
+  .full-img-dark-text { position: absolute; bottom: 32px; left: 40px; font-family: 'Playfair Display', serif; font-size: 15px; font-style: italic; color: rgba(255,255,255,0.28); letter-spacing: 0.1em; }
+
+  /* BEURRE NOISETTE — the signature section */
+  .beurre-section { padding: 64px 40px; }
+  .beurre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+  .beurre-visual { background: linear-gradient(145deg, #f5ede0, #e8d4a0); height: 320px; display: flex; align-items: center; justify-content: center; font-size: 72px; position: relative; overflow: hidden; }
+  .beurre-visual::after { content: 'Beurre Noisette'; position: absolute; bottom: 20px; right: 20px; font-family: 'Playfair Display', serif; font-size: 12px; font-style: italic; color: rgba(0,0,0,0.2); letter-spacing: 0.08em; }
+  .beurre-text .section-title { margin-bottom: 14px; }
+  .beurre-text p { font-size: 15px; color: #666; line-height: 2.1; letter-spacing: 0.02em; }
+  .beurre-steps { margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
+  .beurre-step { display: flex; gap: 14px; align-items: flex-start; }
+  .bs-dot { width: 6px; height: 6px; border-radius: 50%; background: #d4a84a; margin-top: 8px; flex-shrink: 0; }
+  .bs-text { font-size: 13px; color: #888; line-height: 1.7; letter-spacing: 0.02em; }
+
+  /* FLAVORS DETAIL */
+  .flavors-section { padding: 64px 40px; border-top: 0.5px solid #e0ddd8; }
+  .flavors-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #e8e4e0; border: 0.5px solid #e8e4e0; margin-top: 32px; }
+  .flavor-detail-card { background: #fff; padding: 32px 24px; }
+  .fdc-emoji { font-size: 30px; margin-bottom: 14px; }
+  .fdc-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 400; margin-bottom: 6px; color: #1a1a1a; }
+  .fdc-sub { font-size: 11px; letter-spacing: 0.08em; color: #9a7430; margin-bottom: 12px; }
+  .fdc-desc { font-size: 13px; color: #999; line-height: 1.75; letter-spacing: 0.02em; }
+  .fdc-bar { height: 2px; background: #f0ede8; margin-top: 16px; border-radius: 1px; }
+  .fdc-bar-fill { height: 100%; border-radius: 1px; background: linear-gradient(90deg, #d4a84a, #9a7430); }
+
+  /* THREE IMGS */
+  .three-imgs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 0 40px 64px; }
+  .tri { display: flex; align-items: center; justify-content: center; font-size: 44px; border-radius: 2px; }
+  .tri-1 { background: linear-gradient(145deg, #2c2010, #4a3818); height: 220px; }
+  .tri-2 { background: linear-gradient(145deg, #f5ede0, #e8d4a8); height: 220px; margin-top: 32px; }
+  .tri-3 { background: linear-gradient(145deg, #e8e8e0, #d0d0c0); height: 220px; }
+
+  /* INGREDIENTS */
+  .ing-section { padding: 0 40px 64px; }
+  .ing-row { display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 0.5px solid #ece9e4; font-size: 14px; }
+  .ing-row:first-of-type { border-top: 0.5px solid #ece9e4; }
+  .ing-name { color: #1a1a1a; letter-spacing: 0.02em; }
+  .ing-val { color: #999; }
+
+  /* GIFT */
+  .gift-section { margin: 0 40px 64px; background: #faf7f2; border: 0.5px solid #e8e0d0; padding: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+  .gift-text .section-title { font-size: 20px; margin-bottom: 12px; }
+  .gift-text p { font-size: 14px; color: #888; line-height: 1.85; letter-spacing: 0.02em; }
+  .gift-options { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+  .gift-opt { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #fff; border: 0.5px solid #e0ddd8; font-size: 13px; cursor: pointer; transition: border-color 0.15s; }
+  .gift-opt:hover { border-color: #9a7430; }
+  .gift-opt-name { color: #1a1a1a; letter-spacing: 0.02em; }
+  .gift-opt-price { color: #9a7430; }
+  .gift-visual { background: linear-gradient(145deg, #e8e0d0, #d4c8b0); height: 200px; display: flex; align-items: center; justify-content: center; font-size: 56px; border-radius: 2px; }
+
+  /* REVIEW */
+  .review-section { padding: 56px 40px; border-top: 0.5px solid #e0ddd8; }
+  .review-summary { display: flex; align-items: baseline; gap: 16px; margin-bottom: 32px; }
+  .review-score { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 400; line-height: 1; }
+  .review-stars { color: #9a7430; font-size: 16px; letter-spacing: 3px; margin-bottom: 4px; }
+  .review-count { font-size: 13px; color: #aaa; }
+  .review-card { padding: 24px 0; border-bottom: 0.5px solid #ece9e4; }
+  .review-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 9px; }
+  .reviewer-name { font-size: 14px; font-weight: 500; letter-spacing: 0.04em; }
+  .review-meta { font-size: 12px; color: #aaa; }
+  .review-text { font-size: 14px; color: #666; line-height: 1.85; letter-spacing: 0.02em; }
+
+  /* FOOTER */
+  footer { padding: 44px 40px 28px; border-top: 0.5px solid #e0ddd8; background: #faf9f7; }
+  .footer-biz { font-size: 12px; color: #999; line-height: 2; letter-spacing: 0.02em; }
+  .footer-sns { display: flex; gap: 18px; margin: 20px 0 12px; }
+  .footer-sns a { font-size: 13px; color: #666; text-decoration: none; letter-spacing: 0.04em; }
+  .footer-links { display: flex; gap: 14px; }
+  .footer-links a { font-size: 12px; color: #999; text-decoration: underline; }
+
+  @media (max-width: 768px) {
+    nav { padding: 18px 20px; }
+    .nav-links { display: none; }
+    .breadcrumb { padding: 12px 20px; }
+    .product-layout { grid-template-columns: 1fr; }
+    .product-info { padding: 28px 20px; border-left: none; border-top: 0.5px solid #e0ddd8; }
+    .thumb-row { padding: 12px 20px; }
+    .beurre-grid { grid-template-columns: 1fr; }
+    .flavors-grid { grid-template-columns: 1fr; }
+    .three-imgs { grid-template-columns: 1fr; margin: 0 20px 48px; }
+    .tri-2 { margin-top: 0; }
+    .gift-section { grid-template-columns: 1fr; margin: 0 20px 48px; }
+    .histoire-section, .beurre-section, .flavors-section, .ing-section, .review-section { padding-left: 20px; padding-right: 20px; }
+    footer { padding: 32px 20px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Sucré</a>
+  <div class="nav-links">
+    <a href="index.html">Overview</a>
+    <a href="index.html#shop">Online Shop</a>
+    <a href="index.html#review">Review</a>
+    <a href="index.html#help">Help Center</a>
+  </div>
+  <div class="nav-icons">
+    <span title="검색">🔍</span>
+    <span title="위시리스트">♡</span>
+    <span title="장바구니">🛍</span>
+  </div>
+</nav>
+
+<div class="breadcrumb">
+  <a href="index.html">Overview</a>
+  <span class="sep">›</span>
+  <a href="#">Online Shop</a>
+  <span class="sep">›</span>
+  <span class="current">Financier</span>
+</div>
+
+<div class="product-layout">
+  <div class="product-images">
+    <div class="main-img">
+      <div class="main-img-badge">BEURRE NOISETTE</div>
+      <div class="main-img-emoji">🍞</div>
+      <div class="main-img-year">Depuis 2022</div>
+    </div>
+    <div class="thumb-row">
+      <div class="thumb th1 active">🍞</div>
+      <div class="thumb th2">🧈</div>
+      <div class="thumb th3">🌿</div>
+    </div>
+  </div>
+
+  <div class="product-info">
+    <div class="product-category">PÂTISSERIE · PETIT FOUR</div>
+    <div class="product-name">Financier</div>
+    <div class="product-name-fr">피낭시에</div>
+    <div class="product-name-ko">금괴 모양 프랑스 전통 구움과자</div>
+    <div class="product-price">₩ 2,500 <span style="font-size:14px;color:#aaa">/ 개</span></div>
+    <div class="product-price-note">3개입 ₩7,000 · 6개입 ₩13,000 · 선물 박스 가능</div>
+
+    <hr class="divider">
+
+    <div class="option-label">SET</div>
+    <div class="option-btns">
+      <button class="opt-btn">낱개 (1개)</button>
+      <button class="opt-btn selected">3개입</button>
+      <button class="opt-btn">6개입</button>
+      <button class="opt-btn">12개입</button>
+    </div>
+
+    <div class="option-label">FLAVOR 선택</div>
+    <div class="flavor-scroll">
+      <div class="flavor-card selected" onclick="toggleFlavor(this)">
+        <div class="fc-top"><span class="fc-emoji">🧈</span><span class="fc-name">클래식</span></div>
+        <div class="fc-note">Beurre Noisette</div>
+      </div>
+      <div class="flavor-card" onclick="toggleFlavor(this)">
+        <div class="fc-top"><span class="fc-emoji">🍵</span><span class="fc-name">말차</span></div>
+        <div class="fc-note">Matcha</div>
+      </div>
+      <div class="flavor-card" onclick="toggleFlavor(this)">
+        <div class="fc-top"><span class="fc-emoji">🫐</span><span class="fc-name">블루베리</span></div>
+        <div class="fc-note">Blueberry</div>
+      </div>
+      <div class="flavor-card" onclick="toggleFlavor(this)">
+        <div class="fc-top"><span class="fc-emoji">🍫</span><span class="fc-name">초콜릿</span></div>
+        <div class="fc-note">Dark Cacao</div>
+      </div>
+      <div class="flavor-card" onclick="toggleFlavor(this)">
+        <div class="fc-top"><span class="fc-emoji">🍋</span><span class="fc-name">레몬</span></div>
+        <div class="fc-note">Lemon Zest</div>
+      </div>
+      <div class="flavor-card" onclick="toggleFlavor(this)">
+        <div class="fc-top"><span class="fc-emoji">🌹</span><span class="fc-name">얼그레이</span></div>
+        <div class="fc-note">Earl Grey</div>
+      </div>
+    </div>
+
+    <div class="option-label">GIFT PACKAGING</div>
+    <div class="option-btns">
+      <button class="opt-btn selected">기본 박스</button>
+      <button class="opt-btn">리본 포장 (+₩1,000)</button>
+      <button class="opt-btn">크라프트 쇼핑백 (+₩500)</button>
+    </div>
+
+    <div class="qty-row">
+      <div class="qty-label">QTY</div>
+      <div class="qty-ctrl">
+        <button onclick="updateQty(-1)">−</button>
+        <div class="qty-num" id="qty">1</div>
+        <button onclick="updateQty(1)">+</button>
+      </div>
+    </div>
+
+    <button class="btn-cart">ADD TO CART</button>
+    <button class="btn-wish">♡ &nbsp; WISHLIST</button>
+
+    <hr class="divider">
+
+    <div class="note-row"><span>🧈</span> 매일 아침 브라운 버터를 직접 만들어 사용</div>
+    <div class="note-row"><span>🏅</span> 금괴 모양 전통 틀로 구워내는 정통 레시피</div>
+    <div class="note-row"><span>🎁</span> 소중한 분께 드리는 선물로 가장 인기</div>
+  </div>
+</div>
+
+<!-- HISTOIRE -->
+<div class="histoire-section">
+  <div class="section-title">Une Histoire Française</div>
+  <div class="section-body">17세기 파리, 증권거래소 근처 금융가 사람들이 즐겨 먹던 작은 구움과자. 금괴(lingot d'or)를 닮은 직사각형 틀에 구워 'Financier'라는 이름이 붙었습니다. Sucré의 피낭시에는 그 정통 레시피에 충실합니다. 아몬드 파우더의 고소함, 황금빛 브라운 버터의 깊은 향, 달걀흰자의 가벼운 식감. 한 입에 담기는 프랑스의 시간.</div>
+</div>
+
+<div class="full-img-dark">
+  🍞
+  <div class="full-img-dark-text">Une Histoire Française · Since 17th Century</div>
+</div>
+
+<!-- BEURRE NOISETTE -->
+<div class="beurre-section">
+  <div class="beurre-grid">
+    <div class="beurre-visual">🧈</div>
+    <div class="beurre-text">
+      <div class="section-title">Beurre Noisette</div>
+      <p>피낭시에의 핵심은 브라운 버터입니다. 버터를 천천히 가열해 수분이 날아가고 유고형분이 황금빛으로 캐러멜화되는 순간, 헤이즐넛 향이 가득한 '뵈르 누아제트'가 완성됩니다. Sucré는 매일 아침 이 과정을 직접 거칩니다.</p>
+      <div class="beurre-steps">
+        <div class="beurre-step">
+          <div class="bs-dot"></div>
+          <div class="bs-text">버터를 중불에서 천천히 녹여 거품이 사라질 때까지 기다립니다.</div>
+        </div>
+        <div class="beurre-step">
+          <div class="bs-dot"></div>
+          <div class="bs-text">유고형분이 황금빛 갈색으로 변하며 헤이즐넛 향이 올라오는 순간 불을 끕니다.</div>
+        </div>
+        <div class="beurre-step">
+          <div class="bs-dot"></div>
+          <div class="bs-text">체에 걸러 맑게 만든 후, 반죽에 바로 섞어 향이 날아가기 전에 사용합니다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FLAVORS DETAIL -->
+<div class="flavors-section">
+  <div class="section-title">Six Flavors</div>
+  <div class="flavors-grid">
+    <div class="flavor-detail-card">
+      <div class="fdc-emoji">🧈</div>
+      <div class="fdc-name">Classic</div>
+      <div class="fdc-sub">BEURRE NOISETTE</div>
+      <div class="fdc-desc">피낭시에의 원형. 브라운 버터의 깊은 헤이즐넛 향과 아몬드 파우더의 고소함만으로 완성된 클래식.</div>
+      <div class="fdc-bar"><div class="fdc-bar-fill" style="width:90%"></div></div>
+    </div>
+    <div class="flavor-detail-card">
+      <div class="fdc-emoji">🍵</div>
+      <div class="fdc-name">Matcha</div>
+      <div class="fdc-sub">UJI MATCHA</div>
+      <div class="fdc-desc">일본 우지산 고급 말차 파우더를 아낌없이 넣었습니다. 쌉싸름하고 깊은 말차 향이 버터와 만나는 조합.</div>
+      <div class="fdc-bar"><div class="fdc-bar-fill" style="width:82%"></div></div>
+    </div>
+    <div class="flavor-detail-card">
+      <div class="fdc-emoji">🫐</div>
+      <div class="fdc-name">Blueberry</div>
+      <div class="fdc-sub">FRESH BERRY</div>
+      <div class="fdc-desc">반죽 위에 생 블루베리를 올려 구워냅니다. 구워지면서 터지는 블루베리가 새콤달콤한 포인트.</div>
+      <div class="fdc-bar"><div class="fdc-bar-fill" style="width:75%"></div></div>
+    </div>
+    <div class="flavor-detail-card">
+      <div class="fdc-emoji">🍫</div>
+      <div class="fdc-name">Dark Cacao</div>
+      <div class="fdc-sub">72% VALRHONA</div>
+      <div class="fdc-desc">발로나 72% 다크 초콜릿을 섞어 진하고 쌉쌀한 풍미. 속에 가나슈를 숨겨 한 입 베어물면 흘러나옵니다.</div>
+      <div class="fdc-bar"><div class="fdc-bar-fill" style="width:88%"></div></div>
+    </div>
+    <div class="flavor-detail-card">
+      <div class="fdc-emoji">🍋</div>
+      <div class="fdc-name">Lemon Zest</div>
+      <div class="fdc-sub">SICILIAN LEMON</div>
+      <div class="fdc-desc">시칠리아 레몬 제스트를 반죽에 직접 갈아 넣었습니다. 버터의 묵직함을 레몬의 상큼함이 산뜻하게 잡아줍니다.</div>
+      <div class="fdc-bar"><div class="fdc-bar-fill" style="width:70%"></div></div>
+    </div>
+    <div class="flavor-detail-card">
+      <div class="fdc-emoji">🌹</div>
+      <div class="fdc-name">Earl Grey</div>
+      <div class="fdc-sub">BERGAMOT TEA</div>
+      <div class="fdc-desc">얼그레이 티를 우린 버터로 만든 피낭시에. 베르가못의 섬세한 향이 구워지며 더욱 깊어집니다.</div>
+      <div class="fdc-bar"><div class="fdc-bar-fill" style="width:78%"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="three-imgs">
+  <div class="tri tri-1">🍞</div>
+  <div class="tri tri-2">🧈</div>
+  <div class="tri tri-3">🎁</div>
+</div>
+
+<!-- INGREDIENTS -->
+<div class="ing-section">
+  <div class="section-title">Ingredients</div>
+  <div class="ing-row"><span class="ing-name">브라운 버터</span><span class="ing-val">프랑스산 AOP 인증 무염 버터</span></div>
+  <div class="ing-row"><span class="ing-name">아몬드 파우더</span><span class="ing-val">캘리포니아산 블랜치드 아몬드 파우더</span></div>
+  <div class="ing-row"><span class="ing-name">달걀흰자</span><span class="ing-val">국내산 무항생제 유정란</span></div>
+  <div class="ing-row"><span class="ing-name">슈가 파우더</span><span class="ing-val">국내산 순수 슈가 파우더</span></div>
+  <div class="ing-row"><span class="ing-name">박력분</span><span class="ing-val">국내산 박력분</span></div>
+  <div class="ing-row"><span class="ing-name">알레르기 유발</span><span class="ing-val">밀, 달걀, 우유, 견과류(아몬드) 함유</span></div>
+</div>
+
+<!-- GIFT -->
+<div class="gift-section">
+  <div class="gift-text">
+    <div class="section-title">선물로 드리세요</div>
+    <p>피낭시에는 Sucré에서 가장 많이 선물로 구매되는 제품입니다. 금괴를 닮은 우아한 모양과 개별 포장으로, 소중한 분께 드리기에 더없이 좋습니다.</p>
+    <div class="gift-options">
+      <div class="gift-opt">
+        <span class="gift-opt-name">🎁 &nbsp; 리본 포장 박스 (6개입)</span>
+        <span class="gift-opt-price">₩14,000</span>
+      </div>
+      <div class="gift-opt">
+        <span class="gift-opt-name">🛍 &nbsp; 크라프트 쇼핑백 (12개입)</span>
+        <span class="gift-opt-price">₩26,500</span>
+      </div>
+      <div class="gift-opt">
+        <span class="gift-opt-name">✉️ &nbsp; 메시지 카드 추가</span>
+        <span class="gift-opt-price">+₩500</span>
+      </div>
+    </div>
+  </div>
+  <div class="gift-visual">🎁</div>
+</div>
+
+<!-- REVIEW -->
+<div class="review-section">
+  <div class="section-title">Review</div>
+  <div class="review-summary">
+    <div class="review-score">5.0</div>
+    <div>
+      <div class="review-stars">★★★★★</div>
+      <div class="review-count">리뷰 143개</div>
+    </div>
+  </div>
+
+  <div class="review-card">
+    <div class="review-header">
+      <span class="reviewer-name">김*지</span>
+      <span class="review-meta">2026.06.22 &nbsp; ★★★★★</span>
+    </div>
+    <div class="review-text">피낭시에를 많이 먹어봤는데 여기가 진짜 최고예요. 버터 향이 엄청나게 진하고 촉촉해서 한 입 먹으면 멈출 수가 없어요. 얼그레이 맛이 특히 향이 너무 좋아요. 선물용으로도 완벽합니다.</div>
+  </div>
+  <div class="review-card">
+    <div class="review-header">
+      <span class="reviewer-name">박*현</span>
+      <span class="review-meta">2026.06.15 &nbsp; ★★★★★</span>
+    </div>
+    <div class="review-text">다크 카카오 맛 속에 가나슈가 들어있다는 걸 모르고 먹었다가 깜짝 놀랐어요. 정말 맛있어요. 12개입 사서 회사에 가져갔는데 다들 너무 좋아했어요. 재구매 확정입니다.</div>
+  </div>
+  <div class="review-card">
+    <div class="review-header">
+      <span class="reviewer-name">이*수</span>
+      <span class="review-meta">2026.06.08 &nbsp; ★★★★★</span>
+    </div>
+    <div class="review-text">브라운 버터를 직접 만든다는 게 느껴지는 맛이에요. 어딘가 다른 피낭시에들과 차원이 다른 깊이가 있어요. 포장도 너무 예쁘고 선물하기 딱 좋아요. 매달 주문하고 있습니다.</div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-biz">
+    Sucré &nbsp;|&nbsp; 대표: 홍길동 &nbsp;|&nbsp; 사업자등록번호: 000-00-00000<br>
+    통신판매업신고: 0000-충북청주-0000 &nbsp;|&nbsp; 주소: 충북 청주시 상당구 어딘가 123<br>
+    고객센터: 043-000-0000 &nbsp;(평일 AM10 – PM6, 주말·공휴일 휴무)
+  </div>
+  <div class="footer-sns">
+    <a href="https://instagram.com" target="_blank">Instagram</a> /
+    <a href="https://pf.kakao.com" target="_blank">KakaoTalk</a> /
+    <a href="https://blog.naver.com" target="_blank">Naver Blog</a>
+  </div>
+  <div class="footer-links">
+    <a href="#">이용약관</a>
+    <a href="#">개인정보처리방침</a>
+  </div>
+</footer>
+
+<script>
+  let qty = 1;
+  function updateQty(delta) {
+    qty = Math.max(1, qty + delta);
+    document.getElementById('qty').textContent = qty;
+  }
+
+  function toggleFlavor(el) {
+    el.classList.toggle('selected');
+  }
+
+  document.querySelectorAll('.option-btns').forEach(group => {
+    group.querySelectorAll('.opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      });
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sucré — 청주 감성 디저트 카페</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Cormorant Garamond', serif; color: #1a1a1a; background: #fff; }
+
+  /* NAV */
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 40px; border-bottom: 0.5px solid #e0ddd8; position: sticky; top: 0; background: rgba(255,255,255,0.96); backdrop-filter: blur(8px); z-index: 100; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 400; letter-spacing: 0.04em; text-decoration: none; color: #1a1a1a; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { font-size: 13px; color: #666; text-decoration: none; letter-spacing: 0.07em; transition: color 0.15s; }
+  .nav-links a:hover, .nav-links a.active { color: #1a1a1a; border-bottom: 1px solid #b8975a; padding-bottom: 2px; }
+  .nav-icons { display: flex; gap: 18px; font-size: 18px; color: #666; cursor: pointer; }
+
+  /* HERO */
+  .hero { display: grid; grid-template-columns: 1fr 1fr; min-height: 520px; }
+  .hero-left { background: linear-gradient(160deg, #1a1208 0%, #3a2a10 40%, #6a4e20 80%, #9a7838 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 48px; position: relative; overflow: hidden; cursor: pointer; transition: opacity 0.2s; }
+  .hero-left:hover { opacity: 0.93; }
+  .hero-left::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, transparent, transparent 28px, rgba(255,255,255,0.015) 28px, rgba(255,255,255,0.015) 29px); }
+  .hero-right { display: grid; grid-template-rows: 1fr 1fr; }
+  .hero-sub { display: flex; align-items: flex-end; justify-content: flex-end; padding: 32px; position: relative; overflow: hidden; cursor: pointer; transition: opacity 0.2s; }
+  .hero-sub:hover { opacity: 0.88; }
+  .hero-sub-1 { background: linear-gradient(150deg, #e8ddd0, #c8b098); }
+  .hero-sub-2 { background: linear-gradient(150deg, #d4e8d0, #a8c898); border-top: 0.5px solid rgba(255,255,255,0.3); }
+
+  .hero-title { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 400; color: #fff; line-height: 1.2; margin-bottom: 10px; position: relative; z-index: 1; }
+  .hero-sub-title { font-size: 14px; color: rgba(255,255,255,0.55); letter-spacing: 0.06em; margin-bottom: 24px; position: relative; z-index: 1; }
+  .hero-cta { font-size: 13px; color: rgba(255,255,255,0.8); letter-spacing: 0.1em; border-bottom: 0.5px solid rgba(255,255,255,0.4); padding-bottom: 2px; display: inline-block; position: relative; z-index: 1; }
+  .hero-emoji-bg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%); font-size: 100px; opacity: 0.12; z-index: 0; }
+
+  .sub-label { text-align: right; }
+  .sub-label h3 { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 400; color: #1a1a1a; margin-bottom: 4px; }
+  .sub-label a { font-size: 12px; color: #666; text-decoration: underline; letter-spacing: 0.08em; cursor: pointer; }
+  .sub-emoji { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -55%); font-size: 52px; opacity: 0.35; }
+
+  /* TICKER */
+  .ticker { border-top: 0.5px solid #e0ddd8; border-bottom: 0.5px solid #e0ddd8; padding: 12px 0; overflow: hidden; white-space: nowrap; background: #faf9f7; }
+  .ticker-inner { display: inline-flex; gap: 48px; animation: ticker 18s linear infinite; }
+  .ticker-inner:hover { animation-play-state: paused; }
+  .ticker-item { font-size: 12px; color: #999; letter-spacing: 0.1em; }
+  .ticker-dot { color: #d4a84a; }
+  @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* SECTION HEADER */
+  .section-header { display: flex; justify-content: space-between; align-items: baseline; padding: 48px 40px 28px; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 23px; font-weight: 400; }
+  .section-link { font-size: 12px; color: #999; letter-spacing: 0.08em; text-decoration: none; border-bottom: 0.5px solid #ccc; padding-bottom: 1px; }
+
+  /* PRODUCT GRID */
+  .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #e8e4e0; border-top: 0.5px solid #e8e4e0; border-bottom: 0.5px solid #e8e4e0; }
+  .product-card { background: #fff; cursor: pointer; transition: background 0.15s; overflow: hidden; }
+  .product-card:hover { background: #faf8f5; }
+  .product-card:hover .pc-img { opacity: 0.9; }
+  .pc-img { height: 220px; display: flex; align-items: center; justify-content: center; font-size: 56px; transition: opacity 0.2s; position: relative; overflow: hidden; }
+  .pc-img-badge { position: absolute; top: 14px; left: 14px; font-size: 9px; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 1px; font-family: 'Cormorant Garamond', serif; }
+  .badge-gold { background: rgba(255,255,255,0.9); color: #9a7430; border: 0.5px solid #d4a84a; }
+  .badge-green { background: rgba(255,255,255,0.9); color: #5a8a3a; border: 0.5px solid #90c060; }
+  .pc-body { padding: 20px 22px 24px; border-top: 0.5px solid #e8e4e0; }
+  .pc-cat { font-size: 10px; letter-spacing: 0.12em; color: #bbb; margin-bottom: 5px; }
+  .pc-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 400; margin-bottom: 4px; color: #1a1a1a; }
+  .pc-desc { font-size: 13px; color: #999; letter-spacing: 0.02em; margin-bottom: 12px; line-height: 1.5; }
+  .pc-footer { display: flex; justify-content: space-between; align-items: center; }
+  .pc-price { font-size: 15px; color: #1a1a1a; letter-spacing: 0.02em; }
+  .pc-arrow { font-size: 12px; color: #bbb; letter-spacing: 0.06em; }
+
+  .img-cake   { background: linear-gradient(145deg, #ede4d8, #c8b098); }
+  .img-macaron { background: linear-gradient(145deg, #f0e8f4, #d4b8e8); }
+  .img-croffle { background: linear-gradient(145deg, #f5ede0, #d8c080); }
+  .img-latte  { background: linear-gradient(145deg, #2c1c0c, #6a4520); }
+  .img-tart   { background: linear-gradient(145deg, #e8f0e0, #b8d888); }
+  .img-financier { background: linear-gradient(145deg, #1c1408, #6a4e1c); }
+
+  /* ABOUT SECTION */
+  .about-section { display: grid; grid-template-columns: 1fr 1fr; min-height: 400px; }
+  .about-text { padding: 64px 48px; display: flex; flex-direction: column; justify-content: center; border-right: 0.5px solid #e0ddd8; }
+  .about-label { font-size: 10px; letter-spacing: 0.14em; color: #b8975a; margin-bottom: 18px; }
+  .about-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; line-height: 1.35; margin-bottom: 20px; }
+  .about-body { font-size: 15px; color: #666; line-height: 2.1; letter-spacing: 0.02em; }
+  .about-img { background: linear-gradient(150deg, #e8e0d8, #d0c4b0); display: flex; align-items: center; justify-content: center; font-size: 80px; }
+
+  /* INFO STRIP */
+  .info-strip { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 0.5px solid #e0ddd8; border-bottom: 0.5px solid #e0ddd8; }
+  .info-block { padding: 36px 40px; border-right: 0.5px solid #e0ddd8; }
+  .info-block:last-child { border-right: none; }
+  .info-icon { font-size: 22px; margin-bottom: 12px; }
+  .info-label { font-size: 11px; letter-spacing: 0.1em; color: #b8975a; margin-bottom: 8px; }
+  .info-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 400; margin-bottom: 6px; }
+  .info-body { font-size: 13px; color: #999; line-height: 1.75; letter-spacing: 0.02em; }
+
+  /* REVIEW STRIP */
+  .review-strip { padding: 56px 40px; }
+  .review-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px; }
+  .review-card { padding: 28px 24px; border: 0.5px solid #e8e4e0; }
+  .rc-stars { color: #b8975a; font-size: 13px; letter-spacing: 2px; margin-bottom: 12px; }
+  .rc-text { font-size: 14px; color: #555; line-height: 1.85; letter-spacing: 0.02em; margin-bottom: 16px; }
+  .rc-author { display: flex; justify-content: space-between; font-size: 12px; color: #aaa; letter-spacing: 0.02em; }
+  .rc-product { color: #b8975a; }
+
+  /* MAP / VISIT SECTION */
+  .visit-section { display: grid; grid-template-columns: 1fr 1fr; border-top: 0.5px solid #e0ddd8; }
+  .visit-map { background: linear-gradient(145deg, #e8e8e0, #d4d4c4); min-height: 320px; display: flex; align-items: center; justify-content: center; font-size: 48px; position: relative; }
+  .visit-map-label { position: absolute; bottom: 24px; left: 24px; background: #fff; padding: 10px 16px; font-size: 12px; color: #1a1a1a; letter-spacing: 0.04em; border: 0.5px solid #e0ddd8; }
+  .visit-info { padding: 48px 48px; display: flex; flex-direction: column; justify-content: center; border-left: 0.5px solid #e0ddd8; }
+  .visit-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 400; margin-bottom: 28px; }
+  .visit-row { display: flex; gap: 16px; margin-bottom: 18px; align-items: flex-start; }
+  .vr-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+  .vr-label { font-size: 11px; letter-spacing: 0.08em; color: #b8975a; margin-bottom: 3px; }
+  .vr-val { font-size: 14px; color: #1a1a1a; line-height: 1.6; }
+  .visit-sns { display: flex; gap: 12px; margin-top: 28px; }
+  .sns-btn { padding: 9px 20px; border: 0.5px solid #d8d4cc; font-size: 12px; font-family: 'Cormorant Garamond', serif; color: #666; cursor: pointer; letter-spacing: 0.06em; text-decoration: none; transition: all 0.15s; }
+  .sns-btn:hover { border-color: #1a1a1a; color: #1a1a1a; }
+
+  /* FOOTER */
+  footer { padding: 44px 40px 28px; border-top: 0.5px solid #e0ddd8; background: #faf9f7; }
+  .footer-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; }
+  .footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 400; letter-spacing: 0.04em; color: #1a1a1a; }
+  .footer-tagline { font-size: 12px; color: #bbb; letter-spacing: 0.04em; margin-top: 6px; }
+  .footer-nav { display: flex; gap: 32px; }
+  .footer-nav-col { display: flex; flex-direction: column; gap: 10px; }
+  .footer-nav-title { font-size: 11px; letter-spacing: 0.1em; color: #999; margin-bottom: 4px; }
+  .footer-nav a { font-size: 13px; color: #666; text-decoration: none; letter-spacing: 0.02em; }
+  .footer-nav a:hover { color: #1a1a1a; }
+  .footer-divider { border: none; border-top: 0.5px solid #e8e4e0; margin-bottom: 24px; }
+  .footer-biz { font-size: 12px; color: #999; line-height: 2; letter-spacing: 0.02em; }
+  .footer-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+  .footer-links { display: flex; gap: 14px; }
+  .footer-links a { font-size: 12px; color: #bbb; text-decoration: underline; }
+  .footer-copy { font-size: 12px; color: #ccc; letter-spacing: 0.02em; }
+
+  @media (max-width: 768px) {
+    nav { padding: 18px 20px; }
+    .nav-links { display: none; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { grid-template-rows: auto auto; }
+    .hero-left { min-height: 320px; }
+    .product-grid { grid-template-columns: 1fr 1fr; }
+    .about-section, .visit-section { grid-template-columns: 1fr; }
+    .about-img { min-height: 220px; }
+    .info-strip { grid-template-columns: 1fr; }
+    .info-block { border-right: none; border-bottom: 0.5px solid #e0ddd8; }
+    .review-grid { grid-template-columns: 1fr; }
+    .section-header, .review-strip { padding-left: 20px; padding-right: 20px; }
+    .about-text, .visit-info { padding: 36px 20px; }
+    .footer-top { flex-direction: column; gap: 24px; }
+    footer { padding: 36px 20px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Sucré</a>
+  <div class="nav-links">
+    <a href="index.html" class="active">Overview</a>
+    <a href="#shop">Online Shop</a>
+    <a href="#review">Review</a>
+    <a href="#help">Help Center</a>
+  </div>
+  <div class="nav-icons">
+    <span title="검색">🔍</span>
+    <span title="위시리스트">♡</span>
+    <span title="장바구니">🛍</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left" onclick="location.href='strawberry_shortcake.html'">
+    <div class="hero-emoji-bg">🍰</div>
+    <div class="hero-sub-title">SIGNATURE · BEST SELLER</div>
+    <div class="hero-title">달콤함이<br>머무는 공간,<br>Sucré</div>
+    <a class="hero-cta">Shop Now →</a>
+  </div>
+  <div class="hero-right">
+    <div class="hero-sub hero-sub-1" onclick="location.href='macaron_set.html'">
+      <div class="sub-emoji">🍬</div>
+      <div class="sub-label">
+        <h3>Macaron Set</h3>
+        <a>Shop Now →</a>
+      </div>
+    </div>
+    <div class="hero-sub hero-sub-2" onclick="location.href='seasonal_tart.html'">
+      <div class="sub-emoji">🥧</div>
+      <div class="sub-label">
+        <h3>Seasonal Tart</h3>
+        <a>Shop Now →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">🍓 국내산 제철 재료</span>
+    <span class="ticker-dot">·</span>
+    <span class="ticker-item">매일 아침 직접 굽는 수제 디저트</span>
+    <span class="ticker-dot">·</span>
+    <span class="ticker-item">☕ 직접 블렌딩한 시그니처 원두</span>
+    <span class="ticker-dot">·</span>
+    <span class="ticker-item">🎁 선물 포장 서비스 가능</span>
+    <span class="ticker-dot">·</span>
+    <span class="ticker-item">📍 충북 청주시 상당구</span>
+    <span class="ticker-dot">·</span>
+    <span class="ticker-item">🍓 국내산 제철 재료</span>
+    <span class="ticker-dot">·</span>
+    <span class="ticker-item">매일 아침 직접 굽는 수제 디저트</span>
+    <span class="ticker-dot">·</span>
+    <span class="ticker-item">☕ 직접 블렌딩한 시그니처 원두</span>
+    <span class="ticker-dot">·</span>
+    <span class="ticker-item">🎁 선물 포장 서비스 가능</span>
+    <span class="ticker-dot">·</span>
+    <span class="ticker-item">📍 충북 청주시 상당구</span>
+  </div>
+</div>
+
+<!-- SHOP -->
+<div id="shop">
+  <div class="section-header">
+    <div class="section-title">Online Shop</div>
+    <a href="#shop" class="section-link">전체 보기</a>
+  </div>
+
+  <div class="product-grid">
+    <!-- Strawberry Shortcake -->
+    <div class="product-card" onclick="location.href='strawberry_shortcake.html'">
+      <div class="pc-img img-cake">
+        <div class="pc-img-badge badge-gold">BEST SELLER</div>
+        🍰
+      </div>
+      <div class="pc-body">
+        <div class="pc-cat">DESSERT · CAKE</div>
+        <div class="pc-name">Strawberry Shortcake</div>
+        <div class="pc-desc">신선한 딸기와 생크림 레이어</div>
+        <div class="pc-footer">
+          <span class="pc-price">₩ 7,500</span>
+          <span class="pc-arrow">Shop Now →</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Macaron Set -->
+    <div class="product-card" onclick="location.href='macaron_set.html'">
+      <div class="pc-img img-macaron">
+        <div class="pc-img-badge badge-gold">SEASONAL</div>
+        🍬
+      </div>
+      <div class="pc-body">
+        <div class="pc-cat">DESSERT · MACARON</div>
+        <div class="pc-name">Macaron Set</div>
+        <div class="pc-desc">시즌 5가지 플레이버 (5개입)</div>
+        <div class="pc-footer">
+          <span class="pc-price">₩ 8,000</span>
+          <span class="pc-arrow">Shop Now →</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Croffle -->
+    <div class="product-card" onclick="location.href='croffle.html'">
+      <div class="pc-img img-croffle">
+        <div class="pc-img-badge badge-gold">TODAY'S PICK</div>
+        🥐
+      </div>
+      <div class="pc-body">
+        <div class="pc-cat">DESSERT · WAFFLE</div>
+        <div class="pc-name">Croffle</div>
+        <div class="pc-desc">바삭한 크루아상 와플, 주문 즉시 제조</div>
+        <div class="pc-footer">
+          <span class="pc-price">₩ 6,000</span>
+          <span class="pc-arrow">Shop Now →</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signature Latte -->
+    <div class="product-card" onclick="location.href='signature_latte.html'">
+      <div class="pc-img img-latte">
+        <div class="pc-img-badge badge-gold">HOUSE BLEND</div>
+        ☕
+      </div>
+      <div class="pc-body">
+        <div class="pc-cat">BEVERAGE · COFFEE</div>
+        <div class="pc-name">Signature Latte</div>
+        <div class="pc-desc">직접 블렌딩한 싱글 오리진 2종</div>
+        <div class="pc-footer">
+          <span class="pc-price">₩ 5,500</span>
+          <span class="pc-arrow">Shop Now →</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seasonal Tart -->
+    <div class="product-card" onclick="location.href='seasonal_tart.html'">
+      <div class="pc-img img-tart">
+        <div class="pc-img-badge badge-green">JUNE LIMITED</div>
+        🥧
+      </div>
+      <div class="pc-body">
+        <div class="pc-cat">DESSERT · TART</div>
+        <div class="pc-name">Seasonal Tart</div>
+        <div class="pc-desc">여름 — 복숭아 & 바질 타르트</div>
+        <div class="pc-footer">
+          <span class="pc-price">₩ 6,500</span>
+          <span class="pc-arrow">Shop Now →</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Financier -->
+    <div class="product-card" onclick="location.href='financier.html'">
+      <div class="pc-img img-financier">
+        <div class="pc-img-badge badge-gold">GIFT POPULAR</div>
+        🍞
+      </div>
+      <div class="pc-body">
+        <div class="pc-cat">PÂTISSERIE · PETIT FOUR</div>
+        <div class="pc-name">Financier</div>
+        <div class="pc-desc">브라운 버터 전통 프랑스 구움과자</div>
+        <div class="pc-footer">
+          <span class="pc-price">₩ 2,500~</span>
+          <span class="pc-arrow">Shop Now →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="about-section">
+  <div class="about-text">
+    <div class="about-label">ABOUT SUCRÉ</div>
+    <div class="about-title">Inspiration<br>of Nature</div>
+    <div class="about-body">자연에서 영감을 받아 매일 아침 정성껏 구워내는 수제 디저트. Sucré는 프랑스어로 '달콤한'을 뜻합니다. 신선한 제철 재료와 손으로 빚은 디저트 한 조각으로, 일상 속 작은 행복을 드립니다.</div>
+  </div>
+  <div class="about-img">🌿</div>
+</div>
+
+<!-- INFO STRIP -->
+<div class="info-strip">
+  <div class="info-block">
+    <div class="info-icon">🧈</div>
+    <div class="info-label">HANDMADE DAILY</div>
+    <div class="info-title">매일 직접 굽습니다</div>
+    <div class="info-body">전날 만들어놓지 않습니다. 매일 아침 신선한 재료로 그날의 디저트를 굽기 시작합니다.</div>
+  </div>
+  <div class="info-block">
+    <div class="info-icon">🌿</div>
+    <div class="info-label">LOCAL INGREDIENTS</div>
+    <div class="info-title">국내산 제철 재료</div>
+    <div class="info-body">그 계절에 가장 맛있는 국내산 제철 과일과 재료만 사용합니다. 좋은 재료가 좋은 맛을 만듭니다.</div>
+  </div>
+  <div class="info-block">
+    <div class="info-icon">🎁</div>
+    <div class="info-label">GIFT SERVICE</div>
+    <div class="info-title">선물 포장 서비스</div>
+    <div class="info-body">리본 포장, 메시지 카드, 쇼핑백까지. 소중한 분께 드리는 선물을 더 특별하게 만들어 드립니다.</div>
+  </div>
+</div>
+
+<!-- REVIEW SECTION -->
+<div id="review" class="review-strip">
+  <div class="section-header" style="padding:0 0 0 0; margin-bottom:0">
+    <div class="section-title">Customer Review</div>
+    <span style="font-size:13px;color:#b8975a;letter-spacing:.06em">★★★★★ &nbsp;4.9 / 5.0</span>
+  </div>
+  <div class="review-grid">
+    <div class="review-card">
+      <div class="rc-stars">★★★★★</div>
+      <div class="rc-text">생크림이 너무 부드럽고 딸기가 정말 신선해요. 생일 케이크로 주문했는데 포장도 예쁘고 감동받았어요!</div>
+      <div class="rc-author"><span>김*영 · 2026.06.10</span><span class="rc-product">딸기 쇼트케이크</span></div>
+    </div>
+    <div class="review-card">
+      <div class="rc-stars">★★★★★</div>
+      <div class="rc-text">라떼인데 원두 향이 이렇게 살아있는 건 처음이에요. 과일향이 나면서 여운이 길어요. 크로플이랑 조합 최고!</div>
+      <div class="rc-author"><span>장*우 · 2026.06.21</span><span class="rc-product">시그니처 라떼</span></div>
+    </div>
+    <div class="review-card">
+      <div class="rc-stars">★★★★★</div>
+      <div class="rc-text">피낭시에를 많이 먹어봤는데 여기가 진짜 최고예요. 버터 향이 진하고 촉촉해서 한 입 먹으면 멈출 수가 없어요.</div>
+      <div class="rc-author"><span>김*지 · 2026.06.22</span><span class="rc-product">피낭시에</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- VISIT / MAP -->
+<div id="help" class="visit-section">
+  <div class="visit-map">
+    🗺️
+    <div class="visit-map-label">📍 충북 청주시 상당구 어딘가 123</div>
+  </div>
+  <div class="visit-info">
+    <div class="visit-title">Visit Sucré</div>
+    <div class="visit-row">
+      <div class="vr-icon">📍</div>
+      <div>
+        <div class="vr-label">ADDRESS</div>
+        <div class="vr-val">충북 청주시 상당구 어딘가 123</div>
+      </div>
+    </div>
+    <div class="visit-row">
+      <div class="vr-icon">🕙</div>
+      <div>
+        <div class="vr-label">HOURS</div>
+        <div class="vr-val">평일 11:00 – 21:00<br>주말 10:00 – 22:00<br>매월 첫째 월요일 휴무</div>
+      </div>
+    </div>
+    <div class="visit-row">
+      <div class="vr-icon">📞</div>
+      <div>
+        <div class="vr-label">CONTACT</div>
+        <div class="vr-val">043-000-0000<br>평일 AM10 – PM6</div>
+      </div>
+    </div>
+    <div class="visit-sns">
+      <a href="https://instagram.com" target="_blank" class="sns-btn">Instagram</a>
+      <a href="https://pf.kakao.com" target="_blank" class="sns-btn">KakaoTalk</a>
+      <a href="https://blog.naver.com" target="_blank" class="sns-btn">Naver Blog</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">Sucré</div>
+      <div class="footer-tagline">매일 아침 굽는 청주의 감성 디저트 카페</div>
+    </div>
+    <div class="footer-nav">
+      <div class="footer-nav-col">
+        <div class="footer-nav-title">MENU</div>
+        <a href="strawberry_shortcake.html">Strawberry Shortcake</a>
+        <a href="macaron_set.html">Macaron Set</a>
+        <a href="croffle.html">Croffle</a>
+        <a href="signature_latte.html">Signature Latte</a>
+        <a href="seasonal_tart.html">Seasonal Tart</a>
+        <a href="financier.html">Financier</a>
+      </div>
+      <div class="footer-nav-col">
+        <div class="footer-nav-title">INFO</div>
+        <a href="#help">오시는 길</a>
+        <a href="#help">영업시간</a>
+        <a href="#help">고객센터</a>
+        <a href="https://instagram.com" target="_blank">Instagram</a>
+      </div>
+    </div>
+  </div>
+  <hr class="footer-divider">
+  <div class="footer-biz">
+    Sucré &nbsp;|&nbsp; 대표: 홍길동 &nbsp;|&nbsp; 사업자등록번호: 000-00-00000<br>
+    통신판매업신고: 0000-충북청주-0000 &nbsp;|&nbsp; 주소: 충북 청주시 상당구 어딘가 123<br>
+    고객센터: 043-000-0000 &nbsp;(평일 AM10 – PM6, 주말·공휴일 휴무)
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-links">
+      <a href="#">이용약관</a>
+      <a href="#">개인정보처리방침</a>
+    </div>
+    <div class="footer-copy">© 2026 Sucré. All rights reserved.</div>
+  </div>
+</footer>
+
+</body>
+</html>

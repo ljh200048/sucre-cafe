@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signature Latte — Sucré</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Cormorant Garamond', serif; color: #1a1a1a; background: #fff; font-size: 15px; line-height: 1.7; }
+
+  /* NAV */
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 40px; border-bottom: 0.5px solid #e0ddd8; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 400; letter-spacing: 0.04em; text-decoration: none; color: #1a1a1a; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { font-size: 13px; color: #666; text-decoration: none; letter-spacing: 0.07em; transition: color 0.15s; }
+  .nav-links a:hover { color: #1a1a1a; }
+  .nav-icons { display: flex; gap: 18px; font-size: 18px; color: #666; cursor: pointer; }
+
+  /* BREADCRUMB */
+  .breadcrumb { padding: 14px 40px; font-size: 12px; color: #aaa; letter-spacing: 0.04em; display: flex; gap: 8px; align-items: center; border-bottom: 0.5px solid #f0ede8; }
+  .breadcrumb a { color: #aaa; text-decoration: none; }
+  .breadcrumb a:hover { color: #1a1a1a; }
+  .breadcrumb .sep { color: #ddd; font-size: 10px; }
+  .breadcrumb .current { color: #1a1a1a; }
+
+  /* PRODUCT LAYOUT */
+  .product-layout { display: grid; grid-template-columns: 1fr 1fr; }
+
+  .product-images { display: flex; flex-direction: column; }
+  .main-img {
+    background: linear-gradient(160deg, #2c1f14 0%, #4a3020 40%, #6b4530 70%, #8b6040 100%);
+    min-height: 480px; display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .steam { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); display: flex; gap: 18px; }
+  .steam-line { width: 2px; border-radius: 2px; background: linear-gradient(to top, rgba(255,255,255,0.0), rgba(255,255,255,0.25)); animation: steam 2.4s ease-in-out infinite; }
+  .steam-line:nth-child(1) { height: 40px; animation-delay: 0s; }
+  .steam-line:nth-child(2) { height: 56px; animation-delay: 0.4s; }
+  .steam-line:nth-child(3) { height: 40px; animation-delay: 0.8s; }
+  @keyframes steam { 0%,100% { opacity: 0; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-12px); } }
+  .main-img-emoji { font-size: 88px; filter: drop-shadow(0 8px 32px rgba(0,0,0,0.4)); position: relative; z-index: 1; }
+  .main-img-badge { position: absolute; top: 24px; left: 24px; background: rgba(255,255,255,0.12); backdrop-filter: blur(4px); font-size: 10px; letter-spacing: 0.12em; padding: 5px 14px; color: #e8c890; border: 0.5px solid rgba(255,255,255,0.2); font-family: 'Cormorant Garamond', serif; }
+  .main-img-origin { position: absolute; bottom: 24px; right: 24px; font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 0.08em; font-family: 'Cormorant Garamond', serif; }
+
+  .thumb-row { display: flex; gap: 10px; padding: 14px 40px; border-bottom: 0.5px solid #e0ddd8; }
+  .thumb { width: 68px; height: 68px; border-radius: 2px; cursor: pointer; border: 0.5px solid #e0ddd8; display: flex; align-items: center; justify-content: center; font-size: 26px; transition: all 0.2s; }
+  .thumb:hover { opacity: 0.8; }
+  .thumb.active { border: 1px solid #6b4530; }
+  .thumb-1 { background: linear-gradient(145deg, #3a2518, #6b4530); }
+  .thumb-2 { background: linear-gradient(145deg, #f5ede0, #e0c898); }
+  .thumb-3 { background: linear-gradient(145deg, #e8e0d8, #d0c0a8); }
+
+  /* PRODUCT INFO */
+  .product-info { padding: 44px 44px 36px; border-left: 0.5px solid #e0ddd8; display: flex; flex-direction: column; }
+  .product-category { font-size: 11px; letter-spacing: 0.14em; color: #8b6040; margin-bottom: 10px; }
+  .product-name { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; line-height: 1.3; margin-bottom: 5px; }
+  .product-name-ko { font-size: 14px; color: #999; letter-spacing: 0.04em; margin-bottom: 22px; }
+  .product-price { font-size: 24px; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .product-price-note { font-size: 12px; color: #aaa; letter-spacing: 0.02em; margin-bottom: 24px; }
+  .divider { border: none; border-top: 0.5px solid #ece9e4; margin: 18px 0; }
+
+  .option-label { font-size: 11px; letter-spacing: 0.1em; color: #999; margin-bottom: 9px; }
+  .option-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .opt-btn { padding: 7px 16px; border: 0.5px solid #d8d4cc; font-size: 13px; font-family: 'Cormorant Garamond', serif; background: #fff; color: #666; cursor: pointer; letter-spacing: 0.04em; border-radius: 1px; transition: all 0.15s; }
+  .opt-btn:hover { border-color: #999; color: #1a1a1a; }
+  .opt-btn.selected { border: 1px solid #1a1a1a; color: #1a1a1a; background: #faf8f5; }
+
+  /* TEMP TOGGLE */
+  .temp-toggle { display: flex; border: 0.5px solid #d8d4cc; overflow: hidden; margin-bottom: 20px; width: fit-content; }
+  .temp-btn { padding: 8px 28px; font-size: 13px; font-family: 'Cormorant Garamond', serif; background: #fff; color: #666; border: none; cursor: pointer; letter-spacing: 0.06em; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
+  .temp-btn.selected { background: #1a1a1a; color: #fff; }
+
+  /* STRENGTH SLIDER */
+  .strength-row { margin-bottom: 20px; }
+  .strength-labels { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .strength-bar { position: relative; height: 2px; background: #e8e4e0; border-radius: 1px; cursor: pointer; }
+  .strength-fill { height: 100%; background: #1a1a1a; border-radius: 1px; width: 60%; transition: width 0.2s; }
+  .strength-handle { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; left: 60%; cursor: pointer; }
+
+  .qty-row { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+  .qty-label { font-size: 11px; letter-spacing: 0.1em; color: #999; }
+  .qty-ctrl { display: flex; align-items: center; gap: 14px; border: 0.5px solid #d8d4cc; padding: 6px 14px; }
+  .qty-ctrl button { background: none; border: none; font-size: 18px; cursor: pointer; color: #666; line-height: 1; }
+  .qty-ctrl button:hover { color: #1a1a1a; }
+  .qty-num { font-size: 15px; min-width: 20px; text-align: center; }
+
+  .btn-cart { width: 100%; padding: 14px; background: #1a1a1a; color: #fff; border: none; font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: 0.12em; cursor: pointer; margin-bottom: 9px; transition: background 0.2s; }
+  .btn-cart:hover { background: #333; }
+  .btn-wish { width: 100%; padding: 13px; background: #fff; color: #1a1a1a; border: 0.5px solid #1a1a1a; font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: 0.12em; cursor: pointer; transition: background 0.2s; }
+  .btn-wish:hover { background: #faf8f5; }
+
+  .note-row { display: flex; gap: 9px; font-size: 13px; color: #999; line-height: 1.7; align-items: flex-start; margin-bottom: 5px; letter-spacing: 0.02em; }
+
+  /* BEAN STORY */
+  .bean-section { padding: 64px 40px 0; border-top: 0.5px solid #e0ddd8; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 23px; font-weight: 400; margin-bottom: 22px; }
+  .section-body { font-size: 15px; color: #666; line-height: 2.1; letter-spacing: 0.02em; max-width: 700px; }
+
+  /* DARK FULL IMG */
+  .full-img-dark { margin: 48px 0 0; background: linear-gradient(150deg, #1a0f08, #3a2010, #5a3018); height: 320px; display: flex; align-items: center; justify-content: center; font-size: 72px; position: relative; overflow: hidden; }
+  .full-img-dark::after { content: 'Ethiopia Yirgacheffe × Colombia Huila'; position: absolute; bottom: 28px; right: 36px; font-size: 12px; color: rgba(255,255,255,0.35); letter-spacing: 0.1em; font-family: 'Cormorant Garamond', serif; }
+
+  /* ORIGIN SECTION */
+  .origin-section { padding: 64px 40px; }
+  .origin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #e8e4e0; border: 0.5px solid #e8e4e0; margin-top: 32px; }
+  .origin-card { background: #fff; padding: 36px 28px; }
+  .origin-flag { font-size: 28px; margin-bottom: 14px; }
+  .origin-country { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 400; margin-bottom: 4px; }
+  .origin-region { font-size: 12px; color: #8b6040; letter-spacing: 0.08em; margin-bottom: 14px; }
+  .origin-body { font-size: 13px; color: #999; line-height: 1.8; letter-spacing: 0.02em; }
+  .origin-notes { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+  .note-tag { font-size: 11px; color: #8b6040; border: 0.5px solid #d8c8b0; padding: 3px 10px; letter-spacing: 0.06em; border-radius: 1px; }
+
+  /* FLAVOR WHEEL */
+  .wheel-section { padding: 0 40px 64px; }
+  .flavor-wheel { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 28px; }
+  .wheel-item { text-align: center; padding: 16px 8px; border: 0.5px solid #e8e4e0; border-radius: 2px; }
+  .wheel-icon { font-size: 24px; margin-bottom: 8px; }
+  .wheel-label { font-size: 11px; color: #666; letter-spacing: 0.04em; margin-bottom: 8px; line-height: 1.3; }
+  .wheel-bar-wrap { height: 3px; background: #f0ede8; border-radius: 2px; overflow: hidden; }
+  .wheel-bar { height: 100%; background: #8b6040; border-radius: 2px; }
+
+  /* RECIPE */
+  .recipe-section { padding: 0 40px 64px; }
+  .recipe-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 28px; }
+  .recipe-step { padding: 28px 22px; background: #faf8f5; border-radius: 2px; }
+  .rs-num { font-family: 'Playfair Display', serif; font-size: 30px; color: #d8c4a8; line-height: 1; margin-bottom: 12px; }
+  .rs-title { font-size: 14px; font-weight: 500; margin-bottom: 8px; color: #1a1a1a; letter-spacing: 0.02em; }
+  .rs-body { font-size: 13px; color: #999; line-height: 1.75; letter-spacing: 0.02em; }
+
+  /* PAIRING */
+  .pairing-section { padding: 0 40px 64px; }
+  .pairing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
+  .pairing-card { border: 0.5px solid #e8e4e0; padding: 24px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; cursor: pointer; transition: border-color 0.15s; }
+  .pairing-card:hover { border-color: #8b6040; }
+  .pairing-emoji { font-size: 32px; }
+  .pairing-name { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 400; color: #1a1a1a; }
+  .pairing-desc { font-size: 12px; color: #999; line-height: 1.6; letter-spacing: 0.02em; }
+
+  /* INGREDIENTS */
+  .ing-section { padding: 0 40px 64px; border-top: 0.5px solid #e0ddd8; padding-top: 56px; }
+  .ing-row { display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 0.5px solid #ece9e4; font-size: 14px; }
+  .ing-row:first-of-type { border-top: 0.5px solid #ece9e4; }
+  .ing-name { color: #1a1a1a; letter-spacing: 0.02em; }
+  .ing-val { color: #999; }
+
+  /* REVIEW */
+  .review-section { padding: 56px 40px; border-top: 0.5px solid #e0ddd8; }
+  .review-summary { display: flex; align-items: baseline; gap: 16px; margin-bottom: 32px; }
+  .review-score { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 400; line-height: 1; }
+  .review-stars { color: #8b6040; font-size: 16px; letter-spacing: 3px; margin-bottom: 4px; }
+  .review-count { font-size: 13px; color: #aaa; }
+  .review-card { padding: 24px 0; border-bottom: 0.5px solid #ece9e4; }
+  .review-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 9px; }
+  .reviewer-name { font-size: 14px; font-weight: 500; letter-spacing: 0.04em; }
+  .review-meta { font-size: 12px; color: #aaa; }
+  .review-text { font-size: 14px; color: #666; line-height: 1.85; letter-spacing: 0.02em; }
+
+  /* FOOTER */
+  footer { padding: 44px 40px 28px; border-top: 0.5px solid #e0ddd8; background: #faf9f7; }
+  .footer-biz { font-size: 12px; color: #999; line-height: 2; letter-spacing: 0.02em; }
+  .footer-sns { display: flex; gap: 18px; margin: 20px 0 12px; }
+  .footer-sns a { font-size: 13px; color: #666; text-decoration: none; letter-spacing: 0.04em; }
+  .footer-links { display: flex; gap: 14px; }
+  .footer-links a { font-size: 12px; color: #999; text-decoration: underline; }
+
+  @media (max-width: 768px) {
+    nav { padding: 18px 20px; }
+    .nav-links { display: none; }
+    .breadcrumb { padding: 12px 20px; }
+    .product-layout { grid-template-columns: 1fr; }
+    .product-info { padding: 28px 20px; border-left: none; border-top: 0.5px solid #e0ddd8; }
+    .thumb-row { padding: 12px 20px; }
+    .origin-grid { grid-template-columns: 1fr; }
+    .flavor-wheel { grid-template-columns: repeat(3, 1fr); }
+    .recipe-steps, .pairing-grid { grid-template-columns: 1fr; }
+    .bean-section, .origin-section, .wheel-section, .recipe-section, .pairing-section, .ing-section, .review-section { padding-left: 20px; padding-right: 20px; }
+    footer { padding: 32px 20px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Sucré</a>
+  <div class="nav-links">
+    <a href="index.html">Overview</a>
+    <a href="index.html#shop">Online Shop</a>
+    <a href="index.html#review">Review</a>
+    <a href="index.html#help">Help Center</a>
+  </div>
+  <div class="nav-icons">
+    <span title="검색">🔍</span>
+    <span title="위시리스트">♡</span>
+    <span title="장바구니">🛍</span>
+  </div>
+</nav>
+
+<div class="breadcrumb">
+  <a href="index.html">Overview</a>
+  <span class="sep">›</span>
+  <a href="#">Online Shop</a>
+  <span class="sep">›</span>
+  <span class="current">Signature Latte</span>
+</div>
+
+<div class="product-layout">
+  <div class="product-images">
+    <div class="main-img">
+      <div class="main-img-badge">HOUSE BLEND</div>
+      <div class="steam">
+        <div class="steam-line"></div>
+        <div class="steam-line"></div>
+        <div class="steam-line"></div>
+      </div>
+      <div class="main-img-emoji">☕</div>
+      <div class="main-img-origin">Ethiopia × Colombia</div>
+    </div>
+    <div class="thumb-row">
+      <div class="thumb thumb-1 active">☕</div>
+      <div class="thumb thumb-2">🫘</div>
+      <div class="thumb thumb-3">🥛</div>
+    </div>
+  </div>
+
+  <div class="product-info">
+    <div class="product-category">BEVERAGE · COFFEE</div>
+    <div class="product-name">Signature Latte</div>
+    <div class="product-name-ko">시그니처 라떼</div>
+    <div class="product-price">₩ 5,500</div>
+    <div class="product-price-note">HOT / ICED 선택 가능</div>
+
+    <hr class="divider">
+
+    <div class="option-label">TEMPERATURE</div>
+    <div class="temp-toggle" id="tempToggle">
+      <button class="temp-btn selected" onclick="setTemp(this, 'hot')">🔥 &nbsp;HOT</button>
+      <button class="temp-btn" onclick="setTemp(this, 'iced')">🧊 &nbsp;ICED</button>
+    </div>
+
+    <div class="option-label">SIZE</div>
+    <div class="option-btns">
+      <button class="opt-btn selected">Regular (355ml)</button>
+      <button class="opt-btn">Large (473ml) +₩500</button>
+    </div>
+
+    <div class="option-label">MILK</div>
+    <div class="option-btns">
+      <button class="opt-btn selected">일반 우유</button>
+      <button class="opt-btn">귀리 우유 +₩500</button>
+      <button class="opt-btn">두유 +₩500</button>
+    </div>
+
+    <div class="option-label">SHOT</div>
+    <div class="option-btns">
+      <button class="opt-btn">1 shot</button>
+      <button class="opt-btn selected">2 shot</button>
+      <button class="opt-btn">3 shot +₩500</button>
+    </div>
+
+    <div class="option-label">SWEETNESS</div>
+    <div class="strength-row">
+      <div class="strength-labels">
+        <span>없음</span><span>적게</span><span>보통</span><span>많이</span>
+      </div>
+      <div class="strength-bar" id="strengthBar" onclick="setStrength(event)">
+        <div class="strength-fill" id="strengthFill"></div>
+        <div class="strength-handle" id="strengthHandle"></div>
+      </div>
+    </div>
+
+    <div class="qty-row">
+      <div class="qty-label">QTY</div>
+      <div class="qty-ctrl">
+        <button onclick="updateQty(-1)">−</button>
+        <div class="qty-num" id="qty">1</div>
+        <button onclick="updateQty(1)">+</button>
+      </div>
+    </div>
+
+    <button class="btn-cart">ADD TO CART</button>
+    <button class="btn-wish">♡ &nbsp; WISHLIST</button>
+
+    <hr class="divider">
+
+    <div class="note-row"><span>🫘</span> 직접 블렌딩한 싱글 오리진 2종 사용</div>
+    <div class="note-row"><span>🌡️</span> 주문 즉시 에스프레소 추출 후 제조</div>
+    <div class="note-row"><span>🥛</span> 귀리 우유·두유 대체 가능 (+₩500)</div>
+  </div>
+</div>
+
+<!-- BEAN STORY -->
+<div class="bean-section">
+  <div class="section-title">A Story of Two Origins</div>
+  <div class="section-body">Sucré의 시그니처 라떼는 두 가지 싱글 오리진 원두를 직접 블렌딩해 완성합니다. 에티오피아 예르가체페의 밝은 과일향과 콜롬비아 우일라의 깊고 묵직한 단맛이 만나, 라떼 한 잔 속에 복합적이고 풍부한 맛의 층위를 만들어냅니다. 매일 아침 로스팅 날짜를 확인하며 가장 신선한 원두만 사용합니다.</div>
+</div>
+
+<div class="full-img-dark">☕</div>
+
+<!-- ORIGIN -->
+<div class="origin-section">
+  <div class="section-title">Bean Origin</div>
+  <div class="origin-grid">
+    <div class="origin-card">
+      <div class="origin-flag">🇪🇹</div>
+      <div class="origin-country">Ethiopia Yirgacheffe</div>
+      <div class="origin-region">WASHED · LIGHT ROAST · 60%</div>
+      <div class="origin-body">해발 1,700–2,200m의 고지대에서 자란 예르가체페. 워시드 프로세싱으로 깨끗하고 밝은 산미와 자스민, 베르가못, 레몬그라스의 향이 특징입니다.</div>
+      <div class="origin-notes">
+        <span class="note-tag">자스민</span>
+        <span class="note-tag">베르가못</span>
+        <span class="note-tag">레몬</span>
+        <span class="note-tag">복숭아</span>
+      </div>
+    </div>
+    <div class="origin-card">
+      <div class="origin-flag">🇨🇴</div>
+      <div class="origin-country">Colombia Huila</div>
+      <div class="origin-region">WASHED · MEDIUM ROAST · 40%</div>
+      <div class="origin-body">콜롬비아 우일라 지역의 소규모 농장에서 수확한 원두. 밀크 초콜릿의 단맛과 캐러멜, 헤이즐넛의 고소하고 묵직한 바디감이 블렌드의 깊이를 완성합니다.</div>
+      <div class="origin-notes">
+        <span class="note-tag">밀크 초콜릿</span>
+        <span class="note-tag">캐러멜</span>
+        <span class="note-tag">헤이즐넛</span>
+        <span class="note-tag">브라운 슈가</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FLAVOR WHEEL -->
+<div class="wheel-section">
+  <div class="section-title">Flavor Profile</div>
+  <div class="flavor-wheel">
+    <div class="wheel-item">
+      <div class="wheel-icon">🍋</div>
+      <div class="wheel-label">산미</div>
+      <div class="wheel-bar-wrap"><div class="wheel-bar" style="width:55%"></div></div>
+    </div>
+    <div class="wheel-item">
+      <div class="wheel-icon">🍫</div>
+      <div class="wheel-label">단맛</div>
+      <div class="wheel-bar-wrap"><div class="wheel-bar" style="width:75%"></div></div>
+    </div>
+    <div class="wheel-item">
+      <div class="wheel-icon">💪</div>
+      <div class="wheel-label">바디감</div>
+      <div class="wheel-bar-wrap"><div class="wheel-bar" style="width:65%"></div></div>
+    </div>
+    <div class="wheel-item">
+      <div class="wheel-icon">🌸</div>
+      <div class="wheel-label">플로럴</div>
+      <div class="wheel-bar-wrap"><div class="wheel-bar" style="width:60%"></div></div>
+    </div>
+    <div class="wheel-item">
+      <div class="wheel-icon">🌰</div>
+      <div class="wheel-label">고소함</div>
+      <div class="wheel-bar-wrap"><div class="wheel-bar" style="width:70%"></div></div>
+    </div>
+    <div class="wheel-item">
+      <div class="wheel-icon">✨</div>
+      <div class="wheel-label">여운</div>
+      <div class="wheel-bar-wrap"><div class="wheel-bar" style="width:80%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- RECIPE PROCESS -->
+<div class="recipe-section">
+  <div class="section-title">From Bean to Cup</div>
+  <div class="recipe-steps">
+    <div class="recipe-step">
+      <div class="rs-num">01</div>
+      <div class="rs-title">그라인딩</div>
+      <div class="rs-body">주문 즉시 원두를 그라인딩합니다. 신선하게 갈린 원두만이 최상의 향과 맛을 낼 수 있습니다.</div>
+    </div>
+    <div class="recipe-step">
+      <div class="rs-num">02</div>
+      <div class="rs-title">에스프레소 추출</div>
+      <div class="rs-body">93°C 물로 25–30초, 더블 샷을 기준으로 정밀하게 추출합니다. 크레마가 풍성하게 올라오는 순간이 포인트입니다.</div>
+    </div>
+    <div class="recipe-step">
+      <div class="rs-num">03</div>
+      <div class="rs-title">밀크 스티밍</div>
+      <div class="rs-body">65°C로 부드럽게 스티밍한 우유를 에스프레소 위에 천천히 부어 라떼 아트로 마무리합니다.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAIRING -->
+<div class="pairing-section">
+  <div class="section-title">Perfect Pairing</div>
+  <div class="pairing-grid">
+    <div class="pairing-card" onclick="location.href='strawberry_shortcake.html'" style="cursor:pointer">
+      <div class="pairing-emoji">🍰</div>
+      <div class="pairing-name">Strawberry Shortcake</div>
+      <div class="pairing-desc">딸기의 산미가 라떼의 단맛과 어우러져 최고의 조합</div>
+    </div>
+    <div class="pairing-card" onclick="location.href='croffle.html'" style="cursor:pointer">
+      <div class="pairing-emoji">🥐</div>
+      <div class="pairing-name">Croffle</div>
+      <div class="pairing-desc">버터 향 가득한 크로플과 묵직한 라떼의 클래식 페어링</div>
+    </div>
+    <div class="pairing-card" onclick="location.href='macaron_set.html'" style="cursor:pointer">
+      <div class="pairing-emoji">🍬</div>
+      <div class="pairing-name">Macaron Set</div>
+      <div class="pairing-desc">달콤한 마카롱과 쌉쌀한 라떼가 서로의 맛을 살려줍니다</div>
+    </div>
+  </div>
+</div>
+
+<!-- INGREDIENTS -->
+<div class="ing-section">
+  <div class="section-title">Ingredients</div>
+  <div class="ing-row"><span class="ing-name">에스프레소 블렌드</span><span class="ing-val">Ethiopia Yirgacheffe 60% + Colombia Huila 40%</span></div>
+  <div class="ing-row"><span class="ing-name">우유</span><span class="ing-val">국내산 1A 등급 신선 우유</span></div>
+  <div class="ing-row"><span class="ing-name">귀리 우유 (선택)</span><span class="ing-val">Oatly 바리스타 에디션</span></div>
+  <div class="ing-row"><span class="ing-name">시럽 (선택)</span><span class="ing-val">자체 제조 바닐라 시럽</span></div>
+  <div class="ing-row"><span class="ing-name">알레르기 유발</span><span class="ing-val">우유 함유 (두유·귀리 우유 대체 가능)</span></div>
+</div>
+
+<!-- REVIEW -->
+<div class="review-section">
+  <div class="section-title">Review</div>
+  <div class="review-summary">
+    <div class="review-score">4.9</div>
+    <div>
+      <div class="review-stars">★★★★★</div>
+      <div class="review-count">리뷰 212개</div>
+    </div>
+  </div>
+
+  <div class="review-card">
+    <div class="review-header">
+      <span class="reviewer-name">장*우</span>
+      <span class="review-meta">2026.06.21 &nbsp; ★★★★★</span>
+    </div>
+    <div class="review-text">라떼인데 원두 향이 이렇게 살아있는 건 처음 경험해봤어요. 과일향이 나면서 단맛도 있고 여운이 길어요. 크로플이랑 같이 먹으면 진짜 최고입니다.</div>
+  </div>
+  <div class="review-card">
+    <div class="review-header">
+      <span class="reviewer-name">임*나</span>
+      <span class="review-meta">2026.06.14 &nbsp; ★★★★★</span>
+    </div>
+    <div class="review-text">귀리 우유로 바꿔서 주문했는데 너무 고소하고 맛있어요. 달지 않게 부탁했더니 에스프레소 향이 더 잘 살아서 좋았어요. 자스민 향이 은은하게 나는 게 신기했어요.</div>
+  </div>
+  <div class="review-card">
+    <div class="review-header">
+      <span class="reviewer-name">서*훈</span>
+      <span class="review-meta">2026.05.31 &nbsp; ★★★★☆</span>
+    </div>
+    <div class="review-text">청주에서 이 정도 퀄리티의 라떼를 마실 수 있다니 감동이었어요. 라떼 아트도 예쁘게 해줘서 사진도 잘 나왔어요. 다음엔 아이스로 먹어보려고요!</div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-biz">
+    Sucré &nbsp;|&nbsp; 대표: 홍길동 &nbsp;|&nbsp; 사업자등록번호: 000-00-00000<br>
+    통신판매업신고: 0000-충북청주-0000 &nbsp;|&nbsp; 주소: 충북 청주시 상당구 어딘가 123<br>
+    고객센터: 043-000-0000 &nbsp;(평일 AM10 – PM6, 주말·공휴일 휴무)
+  </div>
+  <div class="footer-sns">
+    <a href="https://instagram.com" target="_blank">Instagram</a> /
+    <a href="https://pf.kakao.com" target="_blank">KakaoTalk</a> /
+    <a href="https://blog.naver.com" target="_blank">Naver Blog</a>
+  </div>
+  <div class="footer-links">
+    <a href="#">이용약관</a>
+    <a href="#">개인정보처리방침</a>
+  </div>
+</footer>
+
+<script>
+  let qty = 1;
+  function updateQty(delta) {
+    qty = Math.max(1, qty + delta);
+    document.getElementById('qty').textContent = qty;
+  }
+
+  function setTemp(btn, type) {
+    document.querySelectorAll('.temp-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
+
+  function setStrength(e) {
+    const bar = document.getElementById('strengthBar');
+    const rect = bar.getBoundingClientRect();
+    const pct = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
+    document.getElementById('strengthFill').style.width = pct + '%';
+    document.getElementById('strengthHandle').style.left = pct + '%';
+  }
+
+  document.querySelectorAll('.option-btns').forEach(group => {
+    group.querySelectorAll('.opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      });
+    });
+  });
+</script>
+</body>
+</html>

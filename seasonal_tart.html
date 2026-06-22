@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seasonal Tart — Sucré</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Cormorant Garamond', serif; color: #1a1a1a; background: #fff; font-size: 15px; line-height: 1.7; }
+
+  /* NAV */
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 40px; border-bottom: 0.5px solid #e0ddd8; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 400; letter-spacing: 0.04em; text-decoration: none; color: #1a1a1a; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { font-size: 13px; color: #666; text-decoration: none; letter-spacing: 0.07em; transition: color 0.15s; }
+  .nav-links a:hover { color: #1a1a1a; }
+  .nav-icons { display: flex; gap: 18px; font-size: 18px; color: #666; cursor: pointer; }
+
+  /* BREADCRUMB */
+  .breadcrumb { padding: 14px 40px; font-size: 12px; color: #aaa; letter-spacing: 0.04em; display: flex; gap: 8px; align-items: center; border-bottom: 0.5px solid #f0ede8; }
+  .breadcrumb a { color: #aaa; text-decoration: none; }
+  .breadcrumb a:hover { color: #1a1a1a; }
+  .breadcrumb .sep { color: #ddd; font-size: 10px; }
+  .breadcrumb .current { color: #1a1a1a; }
+
+  /* PRODUCT LAYOUT */
+  .product-layout { display: grid; grid-template-columns: 1fr 1fr; }
+
+  .product-images { display: flex; flex-direction: column; }
+  .main-img {
+    background: linear-gradient(150deg, #e8f0e0 0%, #c8e0a8 45%, #a8cc78 100%);
+    min-height: 480px; display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .main-img-emoji { font-size: 92px; filter: drop-shadow(0 8px 28px rgba(0,0,0,0.12)); position: relative; z-index: 1; }
+  .season-badge { position: absolute; top: 24px; left: 24px; background: #fff; font-size: 10px; letter-spacing: 0.12em; padding: 5px 14px; color: #5a8a3a; border: 0.5px solid #c8e0a8; font-family: 'Cormorant Garamond', serif; }
+  .season-month { position: absolute; bottom: 24px; right: 24px; font-size: 11px; color: rgba(255,255,255,0.8); letter-spacing: 0.1em; font-family: 'Playfair Display', serif; font-style: italic; }
+
+  /* SEASON DOTS */
+  .season-dots { display: flex; gap: 0; border-bottom: 0.5px solid #e0ddd8; }
+  .season-dot { flex: 1; padding: 14px 10px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; border-right: 0.5px solid #e0ddd8; transition: background 0.15s; }
+  .season-dot:last-child { border-right: none; }
+  .season-dot:hover { background: #faf8f5; }
+  .season-dot.active { background: #faf8f5; border-bottom: 2px solid #5a8a3a; }
+  .sd-emoji { font-size: 18px; }
+  .sd-label { font-size: 10px; color: #999; letter-spacing: 0.06em; }
+  .season-dot.active .sd-label { color: #5a8a3a; }
+
+  .thumb-row { display: flex; gap: 10px; padding: 12px 40px; border-bottom: 0.5px solid #e0ddd8; }
+  .thumb { width: 68px; height: 68px; border-radius: 2px; cursor: pointer; border: 0.5px solid #e0ddd8; display: flex; align-items: center; justify-content: center; font-size: 26px; transition: all 0.2s; }
+  .thumb:hover { opacity: 0.8; }
+  .thumb.active { border: 1px solid #5a8a3a; }
+  .thumb-1 { background: linear-gradient(145deg, #e8f0e0, #c8e0a8); }
+  .thumb-2 { background: linear-gradient(145deg, #f0e8e0, #e0c8a8); }
+  .thumb-3 { background: linear-gradient(145deg, #f8f0e0, #f0d890); }
+
+  /* PRODUCT INFO */
+  .product-info { padding: 44px 44px 36px; border-left: 0.5px solid #e0ddd8; display: flex; flex-direction: column; }
+  .product-category { font-size: 11px; letter-spacing: 0.14em; color: #5a8a3a; margin-bottom: 10px; }
+  .season-tag { display: inline-block; font-size: 10px; background: #f0f8e8; color: #5a8a3a; border: 0.5px solid #c8e0a8; padding: 3px 10px; letter-spacing: 0.08em; margin-bottom: 10px; border-radius: 1px; }
+  .product-name { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; line-height: 1.3; margin-bottom: 5px; }
+  .product-name-ko { font-size: 14px; color: #999; letter-spacing: 0.04em; margin-bottom: 22px; }
+  .product-price { font-size: 24px; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .product-price-note { font-size: 12px; color: #aaa; letter-spacing: 0.02em; margin-bottom: 24px; }
+  .divider { border: none; border-top: 0.5px solid #ece9e4; margin: 18px 0; }
+
+  /* AVAILABILITY BANNER */
+  .avail-banner { background: #f4faf0; border: 0.5px solid #c8e0a8; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .avail-dot { width: 7px; height: 7px; border-radius: 50%; background: #5a8a3a; flex-shrink: 0; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.3)} }
+  .avail-text { font-size: 12px; color: #5a8a3a; letter-spacing: 0.04em; }
+
+  .option-label { font-size: 11px; letter-spacing: 0.1em; color: #999; margin-bottom: 9px; }
+  .option-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .opt-btn { padding: 7px 16px; border: 0.5px solid #d8d4cc; font-size: 13px; font-family: 'Cormorant Garamond', serif; background: #fff; color: #666; cursor: pointer; letter-spacing: 0.04em; border-radius: 1px; transition: all 0.15s; }
+  .opt-btn:hover { border-color: #999; color: #1a1a1a; }
+  .opt-btn.selected { border: 1px solid #1a1a1a; color: #1a1a1a; background: #faf8f5; }
+
+  .qty-row { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+  .qty-label { font-size: 11px; letter-spacing: 0.1em; color: #999; }
+  .qty-ctrl { display: flex; align-items: center; gap: 14px; border: 0.5px solid #d8d4cc; padding: 6px 14px; }
+  .qty-ctrl button { background: none; border: none; font-size: 18px; cursor: pointer; color: #666; line-height: 1; }
+  .qty-ctrl button:hover { color: #1a1a1a; }
+  .qty-num { font-size: 15px; min-width: 20px; text-align: center; }
+
+  .btn-cart { width: 100%; padding: 14px; background: #1a1a1a; color: #fff; border: none; font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: 0.12em; cursor: pointer; margin-bottom: 9px; transition: background 0.2s; }
+  .btn-cart:hover { background: #333; }
+  .btn-wish { width: 100%; padding: 13px; background: #fff; color: #1a1a1a; border: 0.5px solid #1a1a1a; font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: 0.12em; cursor: pointer; transition: background 0.2s; }
+  .btn-wish:hover { background: #faf8f5; }
+
+  .note-row { display: flex; gap: 9px; font-size: 13px; color: #999; line-height: 1.7; align-items: flex-start; margin-bottom: 5px; letter-spacing: 0.02em; }
+
+  /* SEASON CALENDAR */
+  .calendar-section { padding: 64px 40px 0; border-top: 0.5px solid #e0ddd8; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 23px; font-weight: 400; margin-bottom: 22px; }
+  .section-body { font-size: 15px; color: #666; line-height: 2.1; letter-spacing: 0.02em; max-width: 700px; }
+
+  .season-calendar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #e8e4e0; border: 0.5px solid #e8e4e0; margin-top: 36px; }
+  .season-card { background: #fff; padding: 32px 24px; position: relative; overflow: hidden; }
+  .season-card.current::after { content: 'NOW'; position: absolute; top: 16px; right: 16px; font-size: 9px; letter-spacing: 0.1em; color: #5a8a3a; background: #f0f8e8; border: 0.5px solid #c8e0a8; padding: 2px 8px; }
+  .sc-season { font-size: 10px; letter-spacing: 0.12em; color: #aaa; margin-bottom: 12px; }
+  .sc-emoji { font-size: 32px; margin-bottom: 12px; }
+  .sc-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 400; margin-bottom: 6px; color: #1a1a1a; }
+  .sc-fruit { font-size: 12px; color: #888; margin-bottom: 10px; letter-spacing: 0.02em; }
+  .sc-color { height: 3px; border-radius: 2px; margin-top: 14px; }
+
+  /* FULL IMG */
+  .full-img { margin: 52px 0 0; background: linear-gradient(150deg, #e0f0d0, #b8d890, #90b860); height: 320px; display: flex; align-items: center; justify-content: center; font-size: 72px; position: relative; overflow: hidden; }
+  .full-img::after { content: '제철 재료만을, 그 계절에만'; position: absolute; bottom: 28px; left: 40px; font-family: 'Playfair Display', serif; font-size: 16px; font-style: italic; color: rgba(255,255,255,0.75); letter-spacing: 0.06em; }
+
+  /* LAYERS */
+  .layers-section { padding: 64px 40px; }
+  .layers-diagram { display: flex; flex-direction: column; gap: 0; margin-top: 32px; border: 0.5px solid #e8e4e0; overflow: hidden; border-radius: 2px; }
+  .layer-row { display: grid; grid-template-columns: 120px 1fr; align-items: stretch; border-bottom: 0.5px solid #e8e4e0; }
+  .layer-row:last-child { border-bottom: none; }
+  .layer-color { display: flex; align-items: center; justify-content: center; font-size: 20px; padding: 20px; }
+  .layer-info { padding: 20px 24px; border-left: 0.5px solid #e8e4e0; }
+  .layer-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 400; margin-bottom: 4px; color: #1a1a1a; }
+  .layer-desc { font-size: 13px; color: #999; line-height: 1.7; letter-spacing: 0.02em; }
+
+  .ly-1 { background: linear-gradient(90deg, #f5e8d0, #eddfc8); }
+  .ly-2 { background: linear-gradient(90deg, #fff8e8, #fff0d0); }
+  .ly-3 { background: linear-gradient(90deg, #fce8d8, #f5dcc8); }
+  .ly-4 { background: linear-gradient(90deg, #e8f4e0, #d8ecc8); }
+  .ly-5 { background: linear-gradient(90deg, #f8f4e8, #f0ead8); }
+
+  /* SPLIT IMGS */
+  .split-section { display: grid; grid-template-columns: 5fr 4fr; gap: 16px; margin: 0 40px 64px; }
+  .split-img-a { background: linear-gradient(145deg, #e8f0e0, #c8e0a8); height: 300px; display: flex; align-items: center; justify-content: center; font-size: 64px; }
+  .split-img-b { background: linear-gradient(145deg, #f8f0e0, #f0d890); height: 300px; display: flex; align-items: center; justify-content: center; font-size: 64px; margin-top: 44px; }
+
+  /* INGREDIENTS */
+  .ing-section { padding: 0 40px 64px; }
+  .ing-row { display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 0.5px solid #ece9e4; font-size: 14px; }
+  .ing-row:first-of-type { border-top: 0.5px solid #ece9e4; }
+  .ing-name { color: #1a1a1a; letter-spacing: 0.02em; }
+  .ing-val { color: #999; }
+
+  /* REVIEW */
+  .review-section { padding: 56px 40px; border-top: 0.5px solid #e0ddd8; }
+  .review-summary { display: flex; align-items: baseline; gap: 16px; margin-bottom: 32px; }
+  .review-score { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 400; line-height: 1; }
+  .review-stars { color: #5a8a3a; font-size: 16px; letter-spacing: 3px; margin-bottom: 4px; }
+  .review-count { font-size: 13px; color: #aaa; }
+  .review-card { padding: 24px 0; border-bottom: 0.5px solid #ece9e4; }
+  .review-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 9px; }
+  .reviewer-name { font-size: 14px; font-weight: 500; letter-spacing: 0.04em; }
+  .review-meta { font-size: 12px; color: #aaa; }
+  .review-text { font-size: 14px; color: #666; line-height: 1.85; letter-spacing: 0.02em; }
+
+  /* FOOTER */
+  footer { padding: 44px 40px 28px; border-top: 0.5px solid #e0ddd8; background: #faf9f7; }
+  .footer-biz { font-size: 12px; color: #999; line-height: 2; letter-spacing: 0.02em; }
+  .footer-sns { display: flex; gap: 18px; margin: 20px 0 12px; }
+  .footer-sns a { font-size: 13px; color: #666; text-decoration: none; letter-spacing: 0.04em; }
+  .footer-links { display: flex; gap: 14px; }
+  .footer-links a { font-size: 12px; color: #999; text-decoration: underline; }
+
+  @media (max-width: 768px) {
+    nav { padding: 18px 20px; }
+    .nav-links { display: none; }
+    .breadcrumb { padding: 12px 20px; }
+    .product-layout { grid-template-columns: 1fr; }
+    .product-info { padding: 28px 20px; border-left: none; border-top: 0.5px solid #e0ddd8; }
+    .thumb-row { padding: 12px 20px; }
+    .season-calendar { grid-template-columns: 1fr 1fr; }
+    .split-section { grid-template-columns: 1fr; margin: 0 20px 48px; }
+    .split-img-b { margin-top: 0; }
+    .calendar-section, .layers-section, .ing-section, .review-section { padding-left: 20px; padding-right: 20px; }
+    footer { padding: 32px 20px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Sucré</a>
+  <div class="nav-links">
+    <a href="index.html">Overview</a>
+    <a href="index.html#shop">Online Shop</a>
+    <a href="index.html#review">Review</a>
+    <a href="index.html#help">Help Center</a>
+  </div>
+  <div class="nav-icons">
+    <span title="검색">🔍</span>
+    <span title="위시리스트">♡</span>
+    <span title="장바구니">🛍</span>
+  </div>
+</nav>
+
+<div class="breadcrumb">
+  <a href="index.html">Overview</a>
+  <span class="sep">›</span>
+  <a href="#">Online Shop</a>
+  <span class="sep">›</span>
+  <span class="current">Seasonal Tart</span>
+</div>
+
+<div class="product-layout">
+  <div class="product-images">
+    <div class="main-img">
+      <div class="season-badge">JUNE · SEASONAL</div>
+      <div class="main-img-emoji">🥧</div>
+      <div class="season-month">Summer Edition</div>
+    </div>
+
+    <!-- SEASON SELECTOR -->
+    <div class="season-dots">
+      <div class="season-dot" onclick="setSeason(this,'spring')">
+        <div class="sd-emoji">🌸</div>
+        <div class="sd-label">SPRING</div>
+      </div>
+      <div class="season-dot active" onclick="setSeason(this,'summer')">
+        <div class="sd-emoji">☀️</div>
+        <div class="sd-label">SUMMER</div>
+      </div>
+      <div class="season-dot" onclick="setSeason(this,'autumn')">
+        <div class="sd-emoji">🍂</div>
+        <div class="sd-label">AUTUMN</div>
+      </div>
+      <div class="season-dot" onclick="setSeason(this,'winter')">
+        <div class="sd-emoji">❄️</div>
+        <div class="sd-label">WINTER</div>
+      </div>
+    </div>
+
+    <div class="thumb-row">
+      <div class="thumb thumb-1 active">🥧</div>
+      <div class="thumb thumb-2">🍑</div>
+      <div class="thumb thumb-3">🌿</div>
+    </div>
+  </div>
+
+  <div class="product-info">
+    <div class="season-tag">☀️ &nbsp;SUMMER 2026 · 6–8월 한정</div>
+    <div class="product-category">DESSERT · TART</div>
+    <div class="product-name">Seasonal Tart</div>
+    <div class="product-name-ko" id="tart-sub">여름 — 복숭아 & 바질 타르트</div>
+    <div class="product-price">₩ 6,500</div>
+    <div class="product-price-note">매달 재료 변경 · 당일 픽업 권장</div>
+
+    <hr class="divider">
+
+    <div class="avail-banner">
+      <div class="avail-dot"></div>
+      <div class="avail-text">현재 판매 중 &nbsp;·&nbsp; 오늘 <strong>12개</strong> 남았습니다</div>
+    </div>
+
+    <div class="option-label">SIZE</div>
+    <div class="option-btns">
+      <button class="opt-btn selected">1 Slice</button>
+      <button class="opt-btn">Whole 4인 (₩24,000)</button>
+      <button class="opt-btn">Whole 6인 (₩34,000)</button>
+    </div>
+
+    <div class="option-label">GLAZE</div>
+    <div class="option-btns">
+      <button class="opt-btn selected">클래식 미러 글레이즈</button>
+      <button class="opt-btn">생과일 토핑 (+₩500)</button>
+    </div>
+
+    <div class="option-label">GIFT PACKAGING</div>
+    <div class="option-btns">
+      <button class="opt-btn selected">기본 박스</button>
+      <button class="opt-btn">리본 포장 (+₩1,000)</button>
+    </div>
+
+    <div class="qty-row">
+      <div class="qty-label">QTY</div>
+      <div class="qty-ctrl">
+        <button onclick="updateQty(-1)">−</button>
+        <div class="qty-num" id="qty">1</div>
+        <button onclick="updateQty(1)">+</button>
+      </div>
+    </div>
+
+    <button class="btn-cart">ADD TO CART</button>
+    <button class="btn-wish">♡ &nbsp; WISHLIST</button>
+
+    <hr class="divider">
+
+    <div class="note-row"><span>📅</span> 매월 1일 새로운 시즌 재료로 변경</div>
+    <div class="note-row"><span>🌿</span> 국내산 제철 과일 100% 사용</div>
+    <div class="note-row"><span>❄️</span> 냉장 보관 · 수령 후 2일 내 섭취 권장</div>
+  </div>
+</div>
+
+<!-- SEASON CALENDAR -->
+<div class="calendar-section">
+  <div class="section-title">A Tart for Every Season</div>
+  <div class="section-body">Sucré의 시즌 타르트는 매달 바뀝니다. 그 계절에 가장 맛있는 제철 과일과 허브를 찾아, 가장 어울리는 크림과 타르트 쉘을 조합합니다. 일 년에 딱 그 시기에만 만날 수 있는 맛입니다.</div>
+
+  <div class="season-calendar">
+    <div class="season-card">
+      <div class="sc-season">SPRING · 3–5월</div>
+      <div class="sc-emoji">🌸</div>
+      <div class="sc-name">딸기 & 얼그레이</div>
+      <div class="sc-fruit">국내산 설향 딸기, 얼그레이 크림</div>
+      <div class="sc-color" style="background: linear-gradient(90deg, #f0c0cc, #e090a8)"></div>
+    </div>
+    <div class="season-card current">
+      <div class="sc-season">SUMMER · 6–8월</div>
+      <div class="sc-emoji">🍑</div>
+      <div class="sc-name">복숭아 & 바질</div>
+      <div class="sc-fruit">황도 복숭아, 바질 크림, 레몬 커드</div>
+      <div class="sc-color" style="background: linear-gradient(90deg, #f0d890, #e8b860)"></div>
+    </div>
+    <div class="season-card">
+      <div class="sc-season">AUTUMN · 9–11월</div>
+      <div class="sc-emoji">🍎</div>
+      <div class="sc-name">무화과 & 호두</div>
+      <div class="sc-fruit">국내산 무화과, 호두 프랄린, 마스카포네</div>
+      <div class="sc-color" style="background: linear-gradient(90deg, #d0a080, #b07850)"></div>
+    </div>
+    <div class="season-card">
+      <div class="sc-season">WINTER · 12–2월</div>
+      <div class="sc-emoji">🍊</div>
+      <div class="sc-name">유자 & 다크 초콜릿</div>
+      <div class="sc-fruit">제주 유자, 다크 초콜릿 가나슈, 생크림</div>
+      <div class="sc-color" style="background: linear-gradient(90deg, #e8c870, #d0a030)"></div>
+    </div>
+  </div>
+</div>
+
+<div class="full-img">🥧</div>
+
+<!-- LAYERS DIAGRAM -->
+<div class="layers-section">
+  <div class="section-title">Anatomy of a Tart</div>
+  <div class="section-body" style="margin-bottom:0">이번 여름 타르트를 구성하는 다섯 개의 레이어.</div>
+  <div class="layers-diagram">
+    <div class="layer-row">
+      <div class="layer-color ly-5">🌿</div>
+      <div class="layer-info">
+        <div class="layer-name">생복숭아 & 바질 장식</div>
+        <div class="layer-desc">얇게 슬라이스한 황도 복숭아와 신선한 바질 잎으로 마무리. 먹기 직전 올려 가장 신선한 상태를 유지합니다.</div>
+      </div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-color ly-3">✨</div>
+      <div class="layer-info">
+        <div class="layer-name">복숭아 미러 글레이즈</div>
+        <div class="layer-desc">복숭아 퓨레로 만든 광택 나는 글레이즈. 타르트에 윤기를 더하고 과일의 신선함을 보호합니다.</div>
+      </div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-color ly-4">🍋</div>
+      <div class="layer-info">
+        <div class="layer-name">레몬 바질 크림</div>
+        <div class="layer-desc">마스카포네 치즈에 생바질을 블렌딩한 크림. 레몬 제스트로 상큼함을 더해 복숭아와 완벽하게 어우러집니다.</div>
+      </div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-color ly-2">🍑</div>
+      <div class="layer-info">
+        <div class="layer-name">복숭아 콩포트</div>
+        <div class="layer-desc">황도 복숭아를 설탕과 레몬즙으로 졸인 과육이 살아있는 콩포트. 타르트에 과일의 진한 풍미를 채워줍니다.</div>
+      </div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-color ly-1">🥚</div>
+      <div class="layer-info">
+        <div class="layer-name">파트 브리제 타르트 쉘</div>
+        <div class="layer-desc">버터와 밀가루를 손으로 빚어 만든 쇼트 크러스트 페이스트리. 얇고 바삭하게 블라인드 베이킹합니다.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="split-section">
+  <div class="split-img-a">🥧</div>
+  <div class="split-img-b">🍑</div>
+</div>
+
+<!-- INGREDIENTS -->
+<div class="ing-section">
+  <div class="section-title">Ingredients</div>
+  <div class="ing-row"><span class="ing-name">타르트 쉘</span><span class="ing-val">국내산 밀가루, 프랑스산 버터, 달걀, 슈가 파우더</span></div>
+  <div class="ing-row"><span class="ing-name">복숭아</span><span class="ing-val">국내산 황도 복숭아 (경북 청도)</span></div>
+  <div class="ing-row"><span class="ing-name">바질 크림</span><span class="ing-val">마스카포네 치즈, 생크림, 신선 바질, 레몬 제스트</span></div>
+  <div class="ing-row"><span class="ing-name">복숭아 콩포트</span><span class="ing-val">복숭아, 설탕, 레몬즙, 바닐라 빈</span></div>
+  <div class="ing-row"><span class="ing-name">미러 글레이즈</span><span class="ing-val">복숭아 퓨레, 젤라틴, 설탕, 레몬즙</span></div>
+  <div class="ing-row"><span class="ing-name">알레르기 유발</span><span class="ing-val">밀, 달걀, 우유 함유</span></div>
+</div>
+
+<!-- REVIEW -->
+<div class="review-section">
+  <div class="section-title">Review</div>
+  <div class="review-summary">
+    <div class="review-score">4.9</div>
+    <div>
+      <div class="review-stars">★★★★★</div>
+      <div class="review-count">리뷰 58개</div>
+    </div>
+  </div>
+
+  <div class="review-card">
+    <div class="review-header">
+      <span class="reviewer-name">노*은</span>
+      <span class="review-meta">2026.06.19 &nbsp; ★★★★★</span>
+    </div>
+    <div class="review-text">복숭아 향이 진짜 살아있어요. 바질 크림이랑 복숭아 조합이 이렇게 잘 어울리는지 몰랐어요. 타르트 쉘도 너무 얇고 바삭해서 진짜 감동이었어요. 이번 달 안에 꼭 다시 먹을 거예요.</div>
+  </div>
+  <div class="review-card">
+    <div class="review-header">
+      <span class="reviewer-name">문*준</span>
+      <span class="review-meta">2026.06.12 &nbsp; ★★★★★</span>
+    </div>
+    <div class="review-text">시즌마다 맛이 바뀐다는 게 너무 좋아요. 봄에 딸기 타르트 먹었는데 그것도 최고였고, 이번 여름 복숭아도 완벽해요. 가을 무화과 타르트가 벌써부터 기대됩니다.</div>
+  </div>
+  <div class="review-card">
+    <div class="review-header">
+      <span class="reviewer-name">홍*연</span>
+      <span class="review-meta">2026.06.03 &nbsp; ★★★★☆</span>
+    </div>
+    <div class="review-text">비주얼이 너무 예뻐서 사진부터 찍었어요. 미러 글레이즈가 완전 빛나더라고요. 생과일 토핑 추가했는데 복숭아 과육이 싱싱해서 더 맛있었어요!</div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-biz">
+    Sucré &nbsp;|&nbsp; 대표: 홍길동 &nbsp;|&nbsp; 사업자등록번호: 000-00-00000<br>
+    통신판매업신고: 0000-충북청주-0000 &nbsp;|&nbsp; 주소: 충북 청주시 상당구 어딘가 123<br>
+    고객센터: 043-000-0000 &nbsp;(평일 AM10 – PM6, 주말·공휴일 휴무)
+  </div>
+  <div class="footer-sns">
+    <a href="https://instagram.com" target="_blank">Instagram</a> /
+    <a href="https://pf.kakao.com" target="_blank">KakaoTalk</a> /
+    <a href="https://blog.naver.com" target="_blank">Naver Blog</a>
+  </div>
+  <div class="footer-links">
+    <a href="#">이용약관</a>
+    <a href="#">개인정보처리방침</a>
+  </div>
+</footer>
+
+<script>
+  let qty = 1;
+  function updateQty(delta) {
+    qty = Math.max(1, qty + delta);
+    document.getElementById('qty').textContent = qty;
+  }
+
+  const seasonData = {
+    spring: { sub: '봄 — 딸기 & 얼그레이 타르트', bg: 'linear-gradient(150deg,#f8e8ec 0%,#f0c8d4 45%,#e0a0b8 100%)', badge: '🌸 SPRING 2027 · 3–5월 한정', badgeColor: '#b05070', badgeBorder: '#f0c8d4', tagBg: '#fdf0f4', month: 'Spring Edition' },
+    summer: { sub: '여름 — 복숭아 & 바질 타르트', bg: 'linear-gradient(150deg,#e8f0e0 0%,#c8e0a8 45%,#a8cc78 100%)', badge: '☀️ SUMMER 2026 · 6–8월 한정', badgeColor: '#5a8a3a', badgeBorder: '#c8e0a8', tagBg: '#f4faf0', month: 'Summer Edition' },
+    autumn: { sub: '가을 — 무화과 & 호두 타르트', bg: 'linear-gradient(150deg,#f0e8dc 0%,#d8c0a0 45%,#c0a070 100%)', badge: '🍂 AUTUMN 2026 · 9–11월 한정', badgeColor: '#8a5a2a', badgeBorder: '#d8c0a0', tagBg: '#faf4ec', month: 'Autumn Edition' },
+    winter: { sub: '겨울 — 유자 & 다크 초콜릿 타르트', bg: 'linear-gradient(150deg,#f8f0d8 0%,#f0d890 45%,#d8b840 100%)', badge: '❄️ WINTER 2026 · 12–2월 한정', badgeColor: '#8a6a10', badgeBorder: '#f0d890', tagBg: '#fdf8e8', month: 'Winter Edition' }
+  };
+
+  function setSeason(el, season) {
+    document.querySelectorAll('.season-dot').forEach(d => d.classList.remove('active'));
+    el.classList.add('active');
+    const d = seasonData[season];
+    document.querySelector('.main-img').style.background = d.bg;
+    document.getElementById('tart-sub').textContent = d.sub;
+    document.querySelector('.season-month').textContent = d.month;
+  }
+
+  document.querySelectorAll('.option-btns').forEach(group => {
+    group.querySelectorAll('.opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      });
+    });
+  });
+</script>
+</body>
+</html>
