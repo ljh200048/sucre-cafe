@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주문하기 — Sucré</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Cormorant Garamond', serif; color: #1a1a1a; background: #fff; font-size: 15px; line-height: 1.7; }
+
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 40px; border-bottom: 0.5px solid #e0ddd8; position: sticky; top: 0; background: rgba(255,255,255,0.96); backdrop-filter: blur(8px); z-index: 100; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 400; letter-spacing: 0.04em; text-decoration: none; color: #1a1a1a; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { font-size: 13px; color: #666; text-decoration: none; letter-spacing: 0.07em; }
+  .nav-links a:hover { color: #1a1a1a; }
+  .nav-links a.active { color: #1a1a1a; border-bottom: 1px solid #b8975a; padding-bottom: 2px; }
+  .nav-icons { display: flex; gap: 18px; font-size: 18px; color: #666; cursor: pointer; }
+
+  .breadcrumb { padding: 14px 40px; font-size: 12px; color: #aaa; letter-spacing: 0.04em; display: flex; gap: 8px; align-items: center; border-bottom: 0.5px solid #f0ede8; }
+  .breadcrumb a { color: #aaa; text-decoration: none; }
+  .breadcrumb a:hover { color: #1a1a1a; }
+  .breadcrumb .sep { color: #ddd; }
+  .breadcrumb .current { color: #1a1a1a; }
+
+  /* PAGE LAYOUT */
+  .page-wrap { display: grid; grid-template-columns: 1fr 400px; gap: 0; min-height: calc(100vh - 120px); }
+
+  /* LEFT — FORM */
+  .form-side { padding: 56px 48px; border-right: 0.5px solid #e0ddd8; }
+  .form-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; margin-bottom: 6px; }
+  .form-sub { font-size: 14px; color: #999; letter-spacing: 0.02em; margin-bottom: 40px; }
+
+  .form-section { margin-bottom: 36px; }
+  .form-section-title { font-size: 11px; letter-spacing: 0.12em; color: #b8975a; margin-bottom: 18px; padding-bottom: 8px; border-bottom: 0.5px solid #f0ede8; }
+
+  .field { margin-bottom: 20px; }
+  .field label { display: block; font-size: 12px; letter-spacing: 0.08em; color: #888; margin-bottom: 7px; }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 11px 14px; border: 0.5px solid #d8d4cc; font-family: 'Cormorant Garamond', serif; font-size: 14px; color: #1a1a1a; background: #fff; outline: none; border-radius: 1px; transition: border-color 0.15s; letter-spacing: 0.02em;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: #1a1a1a; }
+  .field textarea { resize: vertical; min-height: 90px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* MENU SELECTOR */
+  .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
+  .menu-item { border: 0.5px solid #e8e4e0; padding: 14px 16px; cursor: pointer; transition: all 0.15s; border-radius: 1px; display: flex; align-items: center; gap: 12px; }
+  .menu-item:hover { border-color: #b8975a; }
+  .menu-item.selected { border: 1px solid #1a1a1a; background: #faf8f5; }
+  .menu-emoji { font-size: 22px; flex-shrink: 0; }
+  .menu-info { flex: 1; }
+  .menu-name { font-size: 13px; color: #1a1a1a; letter-spacing: 0.02em; margin-bottom: 1px; }
+  .menu-price { font-size: 12px; color: #b8975a; }
+  .menu-qty { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .menu-qty button { background: none; border: 0.5px solid #d8d4cc; width: 22px; height: 22px; cursor: pointer; font-size: 14px; color: #666; border-radius: 1px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .menu-qty button:hover { border-color: #1a1a1a; color: #1a1a1a; }
+  .menu-qty span { font-size: 13px; min-width: 16px; text-align: center; }
+
+  /* PAYMENT */
+  .payment-opts { display: flex; gap: 10px; flex-wrap: wrap; }
+  .pay-btn { padding: 9px 20px; border: 0.5px solid #d8d4cc; font-size: 13px; font-family: 'Cormorant Garamond', serif; color: #666; cursor: pointer; letter-spacing: 0.04em; border-radius: 1px; background: #fff; transition: all 0.15s; }
+  .pay-btn:hover { border-color: #999; color: #1a1a1a; }
+  .pay-btn.selected { border: 1px solid #1a1a1a; color: #1a1a1a; background: #faf8f5; }
+
+  /* SUBMIT */
+  .submit-btn { width: 100%; padding: 15px; background: #1a1a1a; color: #fff; border: none; font-family: 'Cormorant Garamond', serif; font-size: 15px; letter-spacing: 0.12em; cursor: pointer; transition: background 0.2s; margin-top: 8px; }
+  .submit-btn:hover { background: #333; }
+  .submit-btn:disabled { background: #999; cursor: not-allowed; }
+
+  /* SUCCESS / ERROR */
+  .result-msg { display: none; padding: 16px 20px; border-radius: 1px; margin-top: 16px; font-size: 14px; letter-spacing: 0.02em; }
+  .result-msg.success { background: #f0f8e8; border: 0.5px solid #c8e0a8; color: #5a8a3a; }
+  .result-msg.error { background: #fdf0f0; border: 0.5px solid #f0c0c0; color: #c03030; }
+
+  /* RIGHT — SUMMARY */
+  .summary-side { padding: 56px 40px; background: #faf9f7; position: sticky; top: 64px; height: fit-content; }
+  .summary-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 400; margin-bottom: 24px; }
+  .summary-items { min-height: 120px; margin-bottom: 24px; }
+  .summary-empty { font-size: 13px; color: #ccc; letter-spacing: 0.04em; text-align: center; padding: 32px 0; }
+  .summary-item { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; border-bottom: 0.5px solid #ece9e4; font-size: 14px; }
+  .si-name { color: #1a1a1a; }
+  .si-price { color: #b8975a; }
+  .summary-divider { border: none; border-top: 0.5px solid #e0ddd8; margin: 4px 0 16px; }
+  .summary-total { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 6px; }
+  .summary-total .label { letter-spacing: 0.04em; color: #666; }
+  .summary-total .amount { font-family: 'Playfair Display', serif; font-size: 20px; color: #1a1a1a; }
+  .summary-note { font-size: 12px; color: #bbb; letter-spacing: 0.02em; line-height: 1.7; margin-top: 16px; }
+  .summary-note span { display: block; }
+
+  /* NOTICE */
+  .notice-box { margin-top: 28px; background: #fff; border: 0.5px solid #e8e4e0; padding: 18px; }
+  .notice-title { font-size: 11px; letter-spacing: 0.1em; color: #b8975a; margin-bottom: 10px; }
+  .notice-item { font-size: 12px; color: #999; line-height: 1.8; display: flex; gap: 8px; }
+
+  footer { padding: 36px 40px 24px; border-top: 0.5px solid #e0ddd8; background: #faf9f7; }
+  .footer-biz { font-size: 12px; color: #999; line-height: 2; letter-spacing: 0.02em; }
+  .footer-links { display: flex; gap: 14px; margin-top: 12px; }
+  .footer-links a { font-size: 12px; color: #bbb; text-decoration: underline; }
+
+  @media (max-width: 768px) {
+    nav { padding: 18px 20px; }
+    .nav-links { display: none; }
+    .breadcrumb { padding: 12px 20px; }
+    .page-wrap { grid-template-columns: 1fr; }
+    .summary-side { position: static; border-top: 0.5px solid #e0ddd8; }
+    .form-side { padding: 36px 20px; }
+    .summary-side { padding: 36px 20px; }
+    .menu-grid { grid-template-columns: 1fr; }
+    .field-row { grid-template-columns: 1fr; }
+    footer { padding: 28px 20px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Sucré</a>
+  <div class="nav-links">
+    <a href="index.html">Overview</a>
+    <a href="index.html#shop">Online Shop</a>
+    <a href="index.html#review">Review</a>
+    <a href="#" class="active">주문하기</a>
+  </div>
+  <div class="nav-icons">
+    <span>🔍</span>
+    <span>♡</span>
+    <span>🛍</span>
+  </div>
+</nav>
+
+<div class="breadcrumb">
+  <a href="index.html">Overview</a>
+  <span class="sep">›</span>
+  <span class="current">주문하기</span>
+</div>
+
+<div class="page-wrap">
+  <!-- FORM -->
+  <div class="form-side">
+    <div class="form-title">Order</div>
+    <div class="form-sub">주문 완료 후 확인 이메일이 자동으로 발송됩니다</div>
+
+    <form id="orderForm">
+
+      <!-- 1. 주문자 정보 -->
+      <div class="form-section">
+        <div class="form-section-title">01 &nbsp; 주문자 정보</div>
+        <div class="field-row">
+          <div class="field">
+            <label>이름 *</label>
+            <input type="text" id="name" placeholder="홍길동" required>
+          </div>
+          <div class="field">
+            <label>연락처 *</label>
+            <input type="tel" id="phone" placeholder="010-0000-0000" required>
+          </div>
+        </div>
+        <div class="field">
+          <label>이메일 * (주문 확인 메일 수신)</label>
+          <input type="email" id="email" placeholder="example@email.com" required>
+        </div>
+      </div>
+
+      <!-- 2. 수령 방법 -->
+      <div class="form-section">
+        <div class="form-section-title">02 &nbsp; 수령 방법</div>
+        <div class="field">
+          <label>수령 방법 *</label>
+          <select id="delivery">
+            <option value="">선택해주세요</option>
+            <option value="pickup">매장 픽업</option>
+            <option value="delivery">택배 배송 (+3,000원)</option>
+          </select>
+        </div>
+        <div class="field" id="pickupDateField">
+          <label>픽업 희망 날짜 *</label>
+          <input type="date" id="pickupDate">
+        </div>
+        <div class="field" id="pickupTimeField">
+          <label>픽업 희망 시간 *</label>
+          <select id="pickupTime">
+            <option value="">선택해주세요</option>
+            <option>11:00 – 12:00</option>
+            <option>12:00 – 13:00</option>
+            <option>13:00 – 14:00</option>
+            <option>14:00 – 15:00</option>
+            <option>15:00 – 16:00</option>
+            <option>16:00 – 17:00</option>
+            <option>17:00 – 18:00</option>
+            <option>18:00 – 19:00</option>
+            <option>19:00 – 20:00</option>
+            <option>20:00 – 21:00</option>
+          </select>
+        </div>
+        <div class="field" id="addressField" style="display:none">
+          <label>배송 주소 *</label>
+          <input type="text" id="address" placeholder="도로명 주소를 입력해주세요">
+        </div>
+      </div>
+
+      <!-- 3. 메뉴 선택 -->
+      <div class="form-section">
+        <div class="form-section-title">03 &nbsp; 메뉴 선택</div>
+        <div class="menu-grid" id="menuGrid">
+
+          <div class="menu-item" data-name="딸기 쇼트케이크" data-price="7500" onclick="toggleMenu(this)">
+            <div class="menu-emoji">🍰</div>
+            <div class="menu-info">
+              <div class="menu-name">딸기 쇼트케이크</div>
+              <div class="menu-price">₩ 7,500</div>
+              <div class="menu-qty" style="display:none">
+                <button type="button" onclick="event.stopPropagation();changeQty(this,-1)">−</button>
+                <span>1</span>
+                <button type="button" onclick="event.stopPropagation();changeQty(this,1)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="menu-item" data-name="마카롱 세트 (5개입)" data-price="8000" onclick="toggleMenu(this)">
+            <div class="menu-emoji">🍬</div>
+            <div class="menu-info">
+              <div class="menu-name">마카롱 세트</div>
+              <div class="menu-price">₩ 8,000</div>
+              <div class="menu-qty" style="display:none">
+                <button type="button" onclick="event.stopPropagation();changeQty(this,-1)">−</button>
+                <span>1</span>
+                <button type="button" onclick="event.stopPropagation();changeQty(this,1)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="menu-item" data-name="크로플" data-price="6000" onclick="toggleMenu(this)">
+            <div class="menu-emoji">🥐</div>
+            <div class="menu-info">
+              <div class="menu-name">크로플</div>
+              <div class="menu-price">₩ 6,000</div>
+              <div class="menu-qty" style="display:none">
+                <button type="button" onclick="event.stopPropagation();changeQty(this,-1)">−</button>
+                <span>1</span>
+                <button type="button" onclick="event.stopPropagation();changeQty(this,1)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="menu-item" data-name="시그니처 라떼" data-price="5500" onclick="toggleMenu(this)">
+            <div class="menu-emoji">☕</div>
+            <div class="menu-info">
+              <div class="menu-name">시그니처 라떼</div>
+              <div class="menu-price">₩ 5,500</div>
+              <div class="menu-qty" style="display:none">
+                <button type="button" onclick="event.stopPropagation();changeQty(this,-1)">−</button>
+                <span>1</span>
+                <button type="button" onclick="event.stopPropagation();changeQty(this,1)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="menu-item" data-name="시즌 타르트 (복숭아&바질)" data-price="6500" onclick="toggleMenu(this)">
+            <div class="menu-emoji">🥧</div>
+            <div class="menu-info">
+              <div class="menu-name">시즌 타르트</div>
+              <div class="menu-price">₩ 6,500</div>
+              <div class="menu-qty" style="display:none">
+                <button type="button" onclick="event.stopPropagation();changeQty(this,-1)">−</button>
+                <span>1</span>
+                <button type="button" onclick="event.stopPropagation();changeQty(this,1)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="menu-item" data-name="피낭시에 (3개입)" data-price="7000" onclick="toggleMenu(this)">
+            <div class="menu-emoji">🍞</div>
+            <div class="menu-info">
+              <div class="menu-name">피낭시에 3개입</div>
+              <div class="menu-price">₩ 7,000</div>
+              <div class="menu-qty" style="display:none">
+                <button type="button" onclick="event.stopPropagation();changeQty(this,-1)">−</button>
+                <span>1</span>
+                <button type="button" onclick="event.stopPropagation();changeQty(this,1)">+</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 4. 결제 방법 -->
+      <div class="form-section">
+        <div class="form-section-title">04 &nbsp; 결제 방법</div>
+        <div class="payment-opts">
+          <button type="button" class="pay-btn selected" onclick="selectPay(this)">계좌이체</button>
+          <button type="button" class="pay-btn" onclick="selectPay(this)">카카오페이</button>
+          <button type="button" class="pay-btn" onclick="selectPay(this)">토스</button>
+          <button type="button" class="pay-btn" onclick="selectPay(this)">현장결제</button>
+        </div>
+        <div style="margin-top:14px;padding:14px 16px;background:#faf8f5;border:0.5px solid #e8e4e0;font-size:13px;color:#888;line-height:1.8;letter-spacing:.02em" id="payInfo">
+          💳 &nbsp;계좌이체: 카카오뱅크 000000-00-000000 (예금주: 홍길동)<br>주문 확인 후 24시간 내 입금해 주세요.
+        </div>
+      </div>
+
+      <!-- 5. 요청사항 -->
+      <div class="form-section">
+        <div class="form-section-title">05 &nbsp; 요청사항</div>
+        <div class="field">
+          <label>선물 포장 여부</label>
+          <select id="giftWrap">
+            <option value="없음">포장 없음</option>
+            <option value="기본 박스">기본 박스</option>
+            <option value="리본 포장 (+₩1,000)">리본 포장 (+₩1,000)</option>
+            <option value="쇼핑백 (+₩500)">쇼핑백 (+₩500)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>메시지 카드</label>
+          <input type="text" id="message" placeholder="ex. 생일 축하해! (비워두면 생략)">
+        </div>
+        <div class="field">
+          <label>기타 요청사항</label>
+          <textarea id="request" placeholder="알레르기, 특별 요청 등 자유롭게 적어주세요"></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">주문 신청하기</button>
+      <div class="result-msg" id="resultMsg"></div>
+
+    </form>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-side">
+    <div class="summary-title">Order Summary</div>
+    <div class="summary-items" id="summaryItems">
+      <div class="summary-empty" id="summaryEmpty">메뉴를 선택해주세요</div>
+    </div>
+    <hr class="summary-divider">
+    <div class="summary-total">
+      <span class="label">TOTAL</span>
+      <span class="amount" id="totalAmount">₩ 0</span>
+    </div>
+    <div class="summary-note">
+      <span>· 배송 선택 시 배송비 ₩3,000 추가</span>
+      <span>· 리본 포장 선택 시 ₩1,000 추가</span>
+      <span>· 주문 확인 후 연락드립니다</span>
+    </div>
+
+    <div class="notice-box">
+      <div class="notice-title">NOTICE</div>
+      <div class="notice-item">📅 &nbsp;픽업은 주문 후 최소 하루 전날까지 신청해주세요</div>
+      <div class="notice-item" style="margin-top:6px">❄️ &nbsp;냉장 보관 제품은 수령 당일 섭취를 권장합니다</div>
+      <div class="notice-item" style="margin-top:6px">📞 &nbsp;문의: 043-000-0000 (평일 AM10–PM6)</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-biz">
+    Sucré &nbsp;|&nbsp; 대표: 홍길동 &nbsp;|&nbsp; 사업자등록번호: 000-00-00000<br>
+    주소: 충북 청주시 상당구 어딘가 123 &nbsp;|&nbsp; 고객센터: 043-000-0000
+  </div>
+  <div class="footer-links">
+    <a href="#">이용약관</a>
+    <a href="#">개인정보처리방침</a>
+  </div>
+</footer>
+
+<script>
+  // ── EmailJS 초기화 ──────────────────────────────────────────
+  // ⚠️ 아래 3가지를 EmailJS에서 발급받은 값으로 교체해주세요
+  const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // EmailJS > Account > Public Key
+  const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // EmailJS > Email Services > Service ID
+  const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // EmailJS > Email Templates > Template ID
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+
+  // ── 메뉴 선택 ──────────────────────────────────────────────
+  function toggleMenu(el) {
+    el.classList.toggle('selected');
+    const qty = el.querySelector('.menu-qty');
+    qty.style.display = el.classList.contains('selected') ? 'flex' : 'none';
+    updateSummary();
+  }
+
+  function changeQty(btn, delta) {
+    const span = btn.parentElement.querySelector('span');
+    let q = parseInt(span.textContent) + delta;
+    if (q < 1) q = 1;
+    span.textContent = q;
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const items = document.querySelectorAll('.menu-item.selected');
+    const container = document.getElementById('summaryItems');
+    const empty = document.getElementById('summaryEmpty');
+    container.innerHTML = '';
+
+    let total = 0;
+    const isDelivery = document.getElementById('delivery').value === 'delivery';
+
+    if (items.length === 0) {
+      container.innerHTML = '<div class="summary-empty">메뉴를 선택해주세요</div>';
+    } else {
+      items.forEach(item => {
+        const name  = item.dataset.name;
+        const price = parseInt(item.dataset.price);
+        const qty   = parseInt(item.querySelector('.menu-qty span').textContent);
+        const sub   = price * qty;
+        total += sub;
+        const div = document.createElement('div');
+        div.className = 'summary-item';
+        div.innerHTML = `<span class="si-name">${name} × ${qty}</span><span class="si-price">₩ ${sub.toLocaleString()}</span>`;
+        container.appendChild(div);
+      });
+    }
+
+    if (isDelivery) total += 3000;
+    const gift = document.getElementById('giftWrap').value;
+    if (gift.includes('+₩1,000')) total += 1000;
+    if (gift.includes('+₩500'))   total += 500;
+
+    document.getElementById('totalAmount').textContent = '₩ ' + total.toLocaleString();
+  }
+
+  // ── 결제 수단 ──────────────────────────────────────────────
+  const payInfoMap = {
+    '계좌이체': '💳 &nbsp;카카오뱅크 000000-00-000000 (예금주: 홍길동)<br>주문 확인 후 24시간 내 입금해 주세요.',
+    '카카오페이': '💛 &nbsp;카카오페이 송금: 010-0000-0000 (홍길동)<br>주문 확인 메일 수신 후 송금해 주세요.',
+    '토스':       '💙 &nbsp;토스 송금: 010-0000-0000 (홍길동)<br>주문 확인 메일 수신 후 송금해 주세요.',
+    '현장결제':   '🏪 &nbsp;픽업 시 현장에서 결제 가능합니다.<br>카드 / 현금 모두 가능합니다.',
+  };
+
+  function selectPay(btn) {
+    document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('payInfo').innerHTML = payInfoMap[btn.textContent] || '';
+  }
+
+  // ── 배송/픽업 전환 ─────────────────────────────────────────
+  document.getElementById('delivery').addEventListener('change', function() {
+    const isDelivery = this.value === 'delivery';
+    document.getElementById('pickupDateField').style.display  = isDelivery ? 'none' : 'block';
+    document.getElementById('pickupTimeField').style.display  = isDelivery ? 'none' : 'block';
+    document.getElementById('addressField').style.display     = isDelivery ? 'block' : 'none';
+    updateSummary();
+  });
+
+  document.getElementById('giftWrap').addEventListener('change', updateSummary);
+
+  // ── 주문 제출 ──────────────────────────────────────────────
+  document.getElementById('orderForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const selectedMenus = [...document.querySelectorAll('.menu-item.selected')];
+    if (selectedMenus.length === 0) {
+      alert('메뉴를 하나 이상 선택해주세요.');
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '전송 중...';
+
+    // 주문 내역 텍스트 생성
+    const menuList = selectedMenus.map(item => {
+      const qty = item.querySelector('.menu-qty span').textContent;
+      return `${item.dataset.name} × ${qty}개 = ₩${(parseInt(item.dataset.price)*parseInt(qty)).toLocaleString()}`;
+    }).join('\n');
+
+    const total = document.getElementById('totalAmount').textContent;
+    const delivery = document.getElementById('delivery');
+    const deliveryText = delivery.options[delivery.selectedIndex].text;
+    const pickup = document.getElementById('delivery').value === 'pickup'
+      ? `${document.getElementById('pickupDate').value} ${document.getElementById('pickupTime').value}`
+      : document.getElementById('address').value;
+    const payBtn = document.querySelector('.pay-btn.selected');
+
+    const params = {
+      to_name:    document.getElementById('name').value,
+      to_email:   document.getElementById('email').value,
+      phone:      document.getElementById('phone').value,
+      menu_list:  menuList,
+      total:      total,
+      delivery:   deliveryText,
+      pickup_info: pickup,
+      payment:    payBtn ? payBtn.textContent : '',
+      gift_wrap:  document.getElementById('giftWrap').value,
+      message:    document.getElementById('message').value || '없음',
+      request:    document.getElementById('request').value || '없음',
+    };
+
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
+      const msg = document.getElementById('resultMsg');
+      msg.className = 'result-msg success';
+      msg.style.display = 'block';
+      msg.innerHTML = '✅ &nbsp;주문이 접수되었습니다! <strong>' + params.to_email + '</strong>으로 확인 메일을 보내드렸어요. 감사합니다 🎉';
+      btn.textContent = '주문 완료 ✓';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      const msg = document.getElementById('resultMsg');
+      msg.className = 'result-msg error';
+      msg.style.display = 'block';
+      msg.textContent = '❌ 전송에 실패했습니다. 잠시 후 다시 시도해주세요.';
+      btn.disabled = false;
+      btn.textContent = '주문 신청하기';
+    }
+  });
+
+  // 오늘 이전 날짜 비활성화
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('pickupDate').setAttribute('min', today);
+</script>
+</body>
+</html>
