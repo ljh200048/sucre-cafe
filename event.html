@@ -294,40 +294,15 @@
 <div class="apply-section">
   <div class="apply-form-wrap">
     <div class="apply-title">이벤트 신청하기</div>
-    <div class="apply-sub">선착순 50명 · 조기 마감 시 신청이 종료됩니다</div>
+    <div class="apply-sub">선착순 50명 · 3가지만 입력하면 끝!</div>
 
-    <div class="field-row">
-      <div class="field">
-        <label>이름 *</label>
-        <input type="text" id="appName" placeholder="홍길동" required>
-      </div>
-      <div class="field">
-        <label>연락처 *</label>
-        <input type="tel" id="appPhone" placeholder="010-0000-0000" required>
-      </div>
+    <div class="field">
+      <label>이름 *</label>
+      <input type="text" id="appName" placeholder="홍길동" required>
     </div>
     <div class="field">
-      <label>이메일 * (확인 메일 수신)</label>
-      <input type="email" id="appEmail" placeholder="example@email.com" required>
-    </div>
-    <div class="field">
-      <label>희망 방문 날짜 *</label>
-      <input type="date" id="appDate" required>
-    </div>
-    <div class="field">
-      <label>희망 방문 시간 *</label>
-      <select id="appTime">
-        <option value="">선택해주세요</option>
-        <option>11:00 – 12:00</option>
-        <option>12:00 – 13:00</option>
-        <option>13:00 – 14:00</option>
-        <option>14:00 – 15:00</option>
-        <option>15:00 – 16:00</option>
-        <option>16:00 – 17:00</option>
-        <option>17:00 – 18:00</option>
-        <option>18:00 – 19:00</option>
-        <option>19:00 – 20:00</option>
-      </select>
+      <label>연락처 *</label>
+      <input type="tel" id="appPhone" placeholder="010-0000-0000" required>
     </div>
     <div class="field">
       <label>시식 메뉴 선택 *</label>
@@ -339,20 +314,6 @@
         <option>☕ 시그니처 라떼 (HOT/ICED)</option>
         <option>🥧 시즌 타르트 — 복숭아&바질 (1 Slice)</option>
         <option>🍞 피낭시에 (2개, 플레이버 현장 선택)</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>SNS 계정 (후기 작성용)</label>
-      <input type="text" id="appSns" placeholder="인스타그램 @아이디 또는 네이버 블로그 URL">
-    </div>
-    <div class="field">
-      <label>방문 경로</label>
-      <select id="appRoute">
-        <option>인스타그램</option>
-        <option>네이버 검색</option>
-        <option>카카오맵</option>
-        <option>지인 추천</option>
-        <option>기타</option>
       </select>
     </div>
 
@@ -439,10 +400,6 @@
 <script>
   emailjs.init('P_AoK29OKVR_PrqzO');
 
-  // 날짜 최소값 설정
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('appDate').setAttribute('min', today);
-
   // 카운트다운
   function updateCountdown() {
     const target = new Date('2026-07-01T00:00:00');
@@ -468,18 +425,13 @@
   async function submitApply() {
     const name  = document.getElementById('appName').value.trim();
     const phone = document.getElementById('appPhone').value.trim();
-    const email = document.getElementById('appEmail').value.trim();
-    const date  = document.getElementById('appDate').value;
-    const time  = document.getElementById('appTime').value;
     const menu  = document.getElementById('appMenu').value;
-    const sns   = document.getElementById('appSns').value.trim();
-    const route = document.getElementById('appRoute').value;
     const resultEl = document.getElementById('applyResult');
     const btn = document.getElementById('applyBtn');
 
-    if (!name || !phone || !email || !date || !time || !menu) {
+    if (!name || !phone || !menu) {
       resultEl.className = 'result-msg error';
-      resultEl.textContent = '❌ 필수 항목을 모두 입력해주세요.';
+      resultEl.textContent = '❌ 이름, 연락처, 메뉴를 모두 입력해주세요.';
       resultEl.style.display = 'block';
       return;
     }
@@ -489,23 +441,22 @@
 
     try {
       await emailjs.send('service_aorhmtg', 'template_u2duq02', {
-        to_name:   name,
-        to_email:  email,
-        phone:     phone,
-        menu_list: `[무료 시식 이벤트 신청]\n메뉴: ${menu}\n방문 날짜: ${date} ${time}\nSNS: ${sns || '미입력'}\n방문 경로: ${route}`,
-        total:     '무료 시식 이벤트',
-        delivery:  '매장 방문',
-        pickup_info: `${date} ${time}`,
-        payment:   '무료',
-        gift_wrap: '없음',
-        message:   `SNS: ${sns || '미입력'}`,
-        request:   `방문 경로: ${route}`,
+        to_name:     name,
+        to_email:    'sucre@example.com',
+        phone:       phone,
+        menu_list:   `[무료 시식 이벤트 신청]\n이름: ${name}\n연락처: ${phone}\n시식 메뉴: ${menu}`,
+        total:       '무료',
+        delivery:    '매장 방문',
+        pickup_info: '방문 일정 연락 예정',
+        payment:     '무료 이벤트',
+        gift_wrap:   '없음',
+        message:     '없음',
+        request:     '없음',
       });
       resultEl.className = 'result-msg success';
-      resultEl.innerHTML = `🎉 신청이 완료됐어요! <strong>${email}</strong>로 확인 메일을 보내드렸어요.<br>방문 날짜를 꼭 지켜주세요 😊`;
+      resultEl.innerHTML = `🎉 신청 완료! <strong>${name}</strong>님, 곧 연락드릴게요 😊`;
       resultEl.style.display = 'block';
       btn.textContent = '신청 완료 ✓';
-      // 잔여 인원 감소 (시각적)
       const rem = document.getElementById('remainCount');
       const cur = parseInt(rem.textContent);
       if (cur > 0) rem.textContent = (cur - 1) + '명';
