@@ -31,7 +31,7 @@
   .main-img { background: linear-gradient(150deg, #ede4d8 0%, #d8c8b4 50%, #c4a890 100%); min-height: 480px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
   .main-img-icon { font-size: 120px; color: #8b6b55; opacity: 0.18; }
   .main-img-badge { position: absolute; top: 24px; left: 24px; background: #fff; font-size: 10px; letter-spacing: 0.12em; padding: 5px 14px; color: #b8975a; border: 0.5px solid #e0d8c8; font-family: 'Cormorant Garamond', serif; }
-  .thumb-row { display: none; /* hidden */ display: flex; gap: 10px; padding: 14px 40px; border-bottom: 0.5px solid #e0ddd8; }
+  .thumb-row { display: none; }
   .thumb { width: 68px; height: 68px; border-radius: 2px; cursor: pointer; border: 0.5px solid #e0ddd8; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #8b6b55; opacity: 0.5; transition: opacity 0.2s, border-color 0.2s; }
   .thumb:hover { opacity: 0.75; }
   .thumb.active { border: 1px solid #b8975a; opacity: 1; }
@@ -116,7 +116,7 @@
     .breadcrumb { padding: 12px 20px; }
     .product-layout { grid-template-columns: 1fr; }
     .product-info { padding: 28px 20px; border-left: none; border-top: 0.5px solid #e0ddd8; }
-    .thumb-row { padding: 12px 20px; }
+    .thumb-row { display: none; }
     .detail-section, .review-section { padding: 44px 20px; }
     .detail-img-grid { grid-template-columns: 1fr; }
     .detail-img-2 { margin-top: 0; }
