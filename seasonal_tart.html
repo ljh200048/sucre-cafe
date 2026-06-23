@@ -47,7 +47,7 @@
   .sd-label { font-size: 10px; color: #999; letter-spacing: 0.06em; }
   .season-dot.active .sd-label { color: #5a8a3a; }
 
-  .thumb-row { display: flex; gap: 10px; padding: 12px 40px; border-bottom: 0.5px solid #e0ddd8; }
+  .thumb-row { display: none; /* hidden */ display: flex; gap: 10px; padding: 12px 40px; border-bottom: 0.5px solid #e0ddd8; }
   .thumb { width: 68px; height: 68px; border-radius: 2px; cursor: pointer; border: 0.5px solid #e0ddd8; display: flex; align-items: center; justify-content: center; font-size: 26px; transition: all 0.2s; }
   .thumb:hover { opacity: 0.8; }
   .thumb.active { border: 1px solid #5a8a3a; }
@@ -224,10 +224,7 @@
         <div class="sd-label">WINTER</div>
       </div>
     </div>
-
-    <div class="thumb-row">
-      <div class="thumb thumb-1 active">🥧</div>
-      <div class="thumb thumb-2">🍑</div>
+<div class="thumb thumb-2">🍑</div>
       <div class="thumb thumb-3">🌿</div>
     </div>
   </div>

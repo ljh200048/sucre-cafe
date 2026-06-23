@@ -45,7 +45,7 @@
   .main-img-badge { position: absolute; top: 24px; left: 24px; background: rgba(255,255,255,0.08); backdrop-filter: blur(6px); font-size: 10px; letter-spacing: 0.14em; padding: 5px 14px; color: #d4a84a; border: 0.5px solid rgba(212,168,74,0.4); font-family: 'Cormorant Garamond', serif; z-index: 2; }
   .main-img-year { position: absolute; bottom: 24px; right: 28px; font-family: 'Playfair Display', serif; font-size: 13px; font-style: italic; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; z-index: 2; }
 
-  .thumb-row { display: flex; gap: 10px; padding: 14px 40px; border-bottom: 0.5px solid #e0ddd8; }
+  .thumb-row { display: none; /* hidden */ display: flex; gap: 10px; padding: 14px 40px; border-bottom: 0.5px solid #e0ddd8; }
   .thumb { width: 68px; height: 68px; border-radius: 2px; cursor: pointer; border: 0.5px solid #e0ddd8; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: all 0.2s; }
   .thumb:hover { opacity: 0.8; }
   .thumb.active { border: 1px solid #9a7430; }
@@ -230,9 +230,7 @@
       <div class="main-img-emoji">🍞</div>
       <div class="main-img-year">Depuis 2022</div>
     </div>
-    <div class="thumb-row">
-      <div class="thumb th1 active">🍞</div>
-      <div class="thumb th2">🧈</div>
+<div class="thumb th2">🧈</div>
       <div class="thumb th3">🌿</div>
     </div>
   </div>
