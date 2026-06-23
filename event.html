@@ -499,5 +499,31 @@
     }
   });
 </script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  const app = initializeApp({
+    apiKey: "AIzaSyBl9jwmiIQnDjeobk9GBE5I0GO05ONPo6E",
+    authDomain: "sucre-cafe.firebaseapp.com",
+    projectId: "sucre-cafe",
+    storageBucket: "sucre-cafe.firebasestorage.app",
+    messagingSenderId: "1014358894897",
+    appId: "1:1014358894897:web:ce72ad3e9a8a8e95e96810"
+  });
+  const db = getFirestore(app);
+  (async () => {
+    const snap = await getDoc(doc(db, 'settings', 'images'));
+    if (!snap.exists()) return;
+    const data = snap.data();
+    [("event-bg.png", "event-hero"), ("event-about.png", "event-about")].forEach(([file, key]) => {
+      if (data[key]) {
+        document.querySelectorAll(`[style*="${file}"]`).forEach(el => {
+          el.style.backgroundImage = `url('${data[key]}')`;
+        });
+      }
+    });
+  })();
+</script>
 </body>
 </html>

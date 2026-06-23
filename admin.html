@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 — Sucré</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Cormorant Garamond', serif; color: #1a1a1a; background: #faf9f7; min-height: 100vh; }
+
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 18px 40px; border-bottom: 0.5px solid #e0ddd8; background: #1a1a1a; }
+  .nav-logo { font-family: 'Playfair Display', serif; font-size: 18px; color: #fff; letter-spacing: 0.04em; }
+  .nav-badge { font-size: 10px; letter-spacing: 0.1em; color: #b8975a; border: 0.5px solid #b8975a; padding: 3px 10px; margin-left: 12px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .nav-user { font-size: 13px; color: #aaa; letter-spacing: 0.04em; }
+  .nav-logout { font-size: 12px; color: #666; border: 0.5px solid #444; padding: 5px 14px; cursor: pointer; background: none; font-family: inherit; letter-spacing: 0.06em; transition: all 0.15s; }
+  .nav-logout:hover { border-color: #fff; color: #fff; }
+
+  /* LOGIN */
+  .login-wrap { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 60px); padding: 40px 20px; }
+  .login-box { background: #fff; border: 0.5px solid #e0ddd8; padding: 48px 44px; width: 100%; max-width: 400px; }
+  .login-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 400; margin-bottom: 6px; }
+  .login-sub { font-size: 13px; color: #aaa; margin-bottom: 32px; letter-spacing: 0.04em; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 11px; letter-spacing: 0.1em; color: #999; margin-bottom: 7px; }
+  .field input { width: 100%; padding: 11px 14px; border: 0.5px solid #d8d4cc; font-family: 'Cormorant Garamond', serif; font-size: 14px; outline: none; border-radius: 1px; transition: border-color 0.15s; }
+  .field input:focus { border-color: #1a1a1a; }
+  .login-btn { width: 100%; padding: 13px; background: #1a1a1a; color: #fff; border: none; font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: 0.12em; cursor: pointer; transition: background 0.2s; margin-top: 8px; }
+  .login-btn:hover { background: #333; }
+  .login-error { font-size: 13px; color: #c03030; background: #fdf0f0; border: 0.5px solid #f0c0c0; padding: 10px 14px; margin-top: 12px; display: none; }
+
+  /* ADMIN */
+  .admin-wrap { display: none; padding: 40px; max-width: 1100px; margin: 0 auto; }
+  .admin-header { margin-bottom: 36px; }
+  .admin-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 400; margin-bottom: 6px; }
+  .admin-sub { font-size: 13px; color: #999; letter-spacing: 0.02em; }
+
+  /* TABS */
+  .tab-bar { display: flex; gap: 0; border-bottom: 0.5px solid #e0ddd8; margin-bottom: 32px; overflow-x: auto; }
+  .tab { padding: 10px 20px; font-size: 12px; letter-spacing: 0.08em; color: #aaa; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.15s; }
+  .tab:hover { color: #1a1a1a; }
+  .tab.active { color: #1a1a1a; border-bottom: 2px solid #1a1a1a; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* IMAGE CARDS */
+  .img-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+  .img-card { background: #fff; border: 0.5px solid #e0ddd8; overflow: hidden; }
+  .img-preview { height: 180px; background: #f0ede8; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .img-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
+  .img-preview-placeholder { font-size: 32px; opacity: 0.3; }
+  .img-card-body { padding: 16px 18px; }
+  .img-card-title { font-size: 13px; font-weight: 500; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .img-card-desc { font-size: 12px; color: #aaa; letter-spacing: 0.02em; margin-bottom: 14px; }
+  .img-card-key { font-size: 11px; color: #ccc; letter-spacing: 0.06em; margin-bottom: 14px; font-family: monospace; }
+
+  .upload-area { border: 1px dashed #d8d4cc; padding: 16px; text-align: center; cursor: pointer; transition: all 0.15s; border-radius: 1px; margin-bottom: 10px; }
+  .upload-area:hover { border-color: #b8975a; background: #fdf9f2; }
+  .upload-area input { display: none; }
+  .upload-label { font-size: 13px; color: #999; letter-spacing: 0.04em; cursor: pointer; display: block; }
+  .upload-label span { color: #b8975a; text-decoration: underline; }
+
+  .progress-bar { height: 3px; background: #f0ede8; border-radius: 2px; overflow: hidden; display: none; margin-bottom: 10px; }
+  .progress-fill { height: 100%; background: #b8975a; border-radius: 2px; width: 0%; transition: width 0.3s; }
+
+  .save-btn { width: 100%; padding: 10px; background: #1a1a1a; color: #fff; border: none; font-family: 'Cormorant Garamond', serif; font-size: 13px; letter-spacing: 0.1em; cursor: pointer; transition: background 0.2s; display: none; }
+  .save-btn:hover { background: #333; }
+  .save-btn.ready { display: block; }
+
+  .status-msg { font-size: 12px; text-align: center; padding: 6px; border-radius: 1px; display: none; margin-top: 8px; }
+  .status-msg.success { background: #f0f8e8; color: #5a8a3a; border: 0.5px solid #c8e0a8; }
+  .status-msg.error { background: #fdf0f0; color: #c03030; border: 0.5px solid #f0c0c0; }
+
+  /* SECTION HEADER */
+  .section-label { font-size: 11px; letter-spacing: 0.12em; color: #b8975a; margin-bottom: 16px; }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .admin-wrap { padding: 24px 20px; }
+    .img-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div style="display:flex;align-items:center">
+    <div class="nav-logo">Sucré</div>
+    <div class="nav-badge">ADMIN</div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-user" id="navUser"></div>
+    <button class="nav-logout" id="logoutBtn" style="display:none" onclick="logout()">로그아웃</button>
+  </div>
+</nav>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-title">관리자 로그인</div>
+    <div class="login-sub">Sucré 관리자 계정으로 로그인해주세요</div>
+    <div class="field">
+      <label>이메일</label>
+      <input type="email" id="adminEmail" placeholder="admin@sucre.co.kr">
+    </div>
+    <div class="field">
+      <label>비밀번호</label>
+      <input type="password" id="adminPw" placeholder="비밀번호 입력">
+    </div>
+    <button class="login-btn" onclick="adminLogin()">로그인</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-wrap" id="adminWrap">
+  <div class="admin-header">
+    <div class="admin-title">이미지 관리</div>
+    <div class="admin-sub">사진을 업로드하면 즉시 사이트에 반영됩니다</div>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab active" onclick="switchTab('home')">홈</div>
+    <div class="tab" onclick="switchTab('macaron')">마카롱</div>
+    <div class="tab" onclick="switchTab('strawberry')">딸기 쇼트케이크</div>
+    <div class="tab" onclick="switchTab('croffle')">크로플</div>
+    <div class="tab" onclick="switchTab('latte')">시그니처 라떼</div>
+    <div class="tab" onclick="switchTab('tart')">시즌 타르트</div>
+    <div class="tab" onclick="switchTab('financier')">피낭시에</div>
+    <div class="tab" onclick="switchTab('event')">이벤트</div>
+  </div>
+
+  <!-- HOME -->
+  <div class="tab-content active" id="tab-home">
+    <div class="section-label">HOME PAGE</div>
+    <div class="img-grid">
+      <div class="img-card">
+        <div class="img-preview" id="preview-hero">
+          <img id="img-hero" src="">
+          <div class="img-preview-placeholder">🏠</div>
+        </div>
+        <div class="img-card-body">
+          <div class="img-card-title">히어로 이미지</div>
+          <div class="img-card-desc">메인 페이지 상단 대형 배경 이미지</div>
+          <div class="img-card-key">hero.png</div>
+          <div class="upload-area" onclick="document.getElementById('file-hero').click()">
+            <input type="file" id="file-hero" accept="image/*" onchange="handleUpload(this,'hero','hero-img')">
+            <label class="upload-label">클릭하여 <span>사진 선택</span></label>
+          </div>
+          <div class="progress-bar" id="prog-hero"><div class="progress-fill" id="fill-hero"></div></div>
+          <div class="status-msg" id="status-hero"></div>
+        </div>
+      </div>
+
+      <div class="img-card">
+        <div class="img-preview" id="preview-about">
+          <img id="img-about" src="">
+          <div class="img-preview-placeholder">🌿</div>
+        </div>
+        <div class="img-card-body">
+          <div class="img-card-title">About 이미지</div>
+          <div class="img-card-desc">홈 페이지 About Sucré 섹션 이미지</div>
+          <div class="img-card-key">event-about.png</div>
+          <div class="upload-area" onclick="document.getElementById('file-about').click()">
+            <input type="file" id="file-about" accept="image/*" onchange="handleUpload(this,'about','about-img')">
+            <label class="upload-label">클릭하여 <span>사진 선택</span></label>
+          </div>
+          <div class="progress-bar" id="prog-about"><div class="progress-fill" id="fill-about"></div></div>
+          <div class="status-msg" id="status-about"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MACARON -->
+  <div class="tab-content" id="tab-macaron">
+    <div class="section-label">MACARON SET PAGE</div>
+    <div class="img-grid">
+      <div class="img-card">
+        <div class="img-preview"><img id="img-macaron-main" src=""><div class="img-preview-placeholder">🍬</div></div>
+        <div class="img-card-body">
+          <div class="img-card-title">메인 이미지</div>
+          <div class="img-card-desc">마카롱 상세 페이지 상단 메인 사진</div>
+          <div class="img-card-key">macaron-main.png</div>
+          <div class="upload-area" onclick="document.getElementById('file-macaron-main').click()">
+            <input type="file" id="file-macaron-main" accept="image/*" onchange="handleUpload(this,'macaron-main','macaron-main-img')">
+            <label class="upload-label">클릭하여 <span>사진 선택</span></label>
+          </div>
+          <div class="progress-bar" id="prog-macaron-main"><div class="progress-fill" id="fill-macaron-main"></div></div>
+          <div class="status-msg" id="status-macaron-main"></div>
+        </div>
+      </div>
+      <div class="img-card">
+        <div class="img-preview"><img id="img-macaron-detail" src=""><div class="img-preview-placeholder">🍬</div></div>
+        <div class="img-card-body">
+          <div class="img-card-title">상세 이미지</div>
+          <div class="img-card-desc">Five Flavors 섹션 위 상세 사진</div>
+          <div class="img-card-key">macaron-hero.png</div>
+          <div class="upload-area" onclick="document.getElementById('file-macaron-detail').click()">
+            <input type="file" id="file-macaron-detail" accept="image/*" onchange="handleUpload(this,'macaron-detail','macaron-detail-img')">
+            <label class="upload-label">클릭하여 <span>사진 선택</span></label>
+          </div>
+          <div class="progress-bar" id="prog-macaron-detail"><div class="progress-fill" id="fill-macaron-detail"></div></div>
+          <div class="status-msg" id="status-macaron-detail"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STRAWBERRY -->
+  <div class="tab-content" id="tab-strawberry">
+    <div class="section-label">STRAWBERRY SHORTCAKE PAGE</div>
+    <div class="img-grid">
+      <div class="img-card">
+        <div class="img-preview"><img id="img-strawberry-main" src=""><div class="img-preview-placeholder">🍰</div></div>
+        <div class="img-card-body">
+          <div class="img-card-title">메인 이미지</div>
+          <div class="img-card-desc">딸기 쇼트케이크 상세 페이지 메인</div>
+          <div class="img-card-key">strawberry-main.png</div>
+          <div class="upload-area" onclick="document.getElementById('file-strawberry-main').click()">
+            <input type="file" id="file-strawberry-main" accept="image/*" onchange="handleUpload(this,'strawberry-main','strawberry-main-img')">
+            <label class="upload-label">클릭하여 <span>사진 선택</span></label>
+          </div>
+          <div class="progress-bar" id="prog-strawberry-main"><div class="progress-fill" id="fill-strawberry-main"></div></div>
+          <div class="status-msg" id="status-strawberry-main"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CROFFLE -->
+  <div class="tab-content" id="tab-croffle">
+    <div class="section-label">CROFFLE PAGE</div>
+    <div class="img-grid">
+      <div class="img-card">
+        <div class="img-preview"><img id="img-croffle-main" src=""><div class="img-preview-placeholder">🥐</div></div>
+        <div class="img-card-body">
+          <div class="img-card-title">메인 이미지</div>
+          <div class="img-card-desc">크로플 상세 페이지 메인</div>
+          <div class="img-card-key">croffle-main.png</div>
+          <div class="upload-area" onclick="document.getElementById('file-croffle-main').click()">
+            <input type="file" id="file-croffle-main" accept="image/*" onchange="handleUpload(this,'croffle-main','croffle-main-img')">
+            <label class="upload-label">클릭하여 <span>사진 선택</span></label>
+          </div>
+          <div class="progress-bar" id="prog-croffle-main"><div class="progress-fill" id="fill-croffle-main"></div></div>
+          <div class="status-msg" id="status-croffle-main"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LATTE -->
+  <div class="tab-content" id="tab-latte">
+    <div class="section-label">SIGNATURE LATTE PAGE</div>
+    <div class="img-grid">
+      <div class="img-card">
+        <div class="img-preview"><img id="img-latte-main" src=""><div class="img-preview-placeholder">☕</div></div>
+        <div class="img-card-body">
+          <div class="img-card-title">메인 이미지</div>
+          <div class="img-card-desc">시그니처 라떼 상세 페이지 메인</div>
+          <div class="img-card-key">latte-main.png</div>
+          <div class="upload-area" onclick="document.getElementById('file-latte-main').click()">
+            <input type="file" id="file-latte-main" accept="image/*" onchange="handleUpload(this,'latte-main','latte-main-img')">
+            <label class="upload-label">클릭하여 <span>사진 선택</span></label>
+          </div>
+          <div class="progress-bar" id="prog-latte-main"><div class="progress-fill" id="fill-latte-main"></div></div>
+          <div class="status-msg" id="status-latte-main"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TART -->
+  <div class="tab-content" id="tab-tart">
+    <div class="section-label">SEASONAL TART PAGE</div>
+    <div class="img-grid">
+      <div class="img-card">
+        <div class="img-preview"><img id="img-tart-main" src=""><div class="img-preview-placeholder">🥧</div></div>
+        <div class="img-card-body">
+          <div class="img-card-title">메인 이미지</div>
+          <div class="img-card-desc">시즌 타르트 상세 페이지 메인</div>
+          <div class="img-card-key">tart-main.png</div>
+          <div class="upload-area" onclick="document.getElementById('file-tart-main').click()">
+            <input type="file" id="file-tart-main" accept="image/*" onchange="handleUpload(this,'tart-main','tart-main-img')">
+            <label class="upload-label">클릭하여 <span>사진 선택</span></label>
+          </div>
+          <div class="progress-bar" id="prog-tart-main"><div class="progress-fill" id="fill-tart-main"></div></div>
+          <div class="status-msg" id="status-tart-main"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIER -->
+  <div class="tab-content" id="tab-financier">
+    <div class="section-label">FINANCIER PAGE</div>
+    <div class="img-grid">
+      <div class="img-card">
+        <div class="img-preview"><img id="img-financier-main" src=""><div class="img-preview-placeholder">🍞</div></div>
+        <div class="img-card-body">
+          <div class="img-card-title">메인 이미지</div>
+          <div class="img-card-desc">피낭시에 상세 페이지 메인</div>
+          <div class="img-card-key">financier-main.png</div>
+          <div class="upload-area" onclick="document.getElementById('file-financier-main').click()">
+            <input type="file" id="file-financier-main" accept="image/*" onchange="handleUpload(this,'financier-main','financier-main-img')">
+            <label class="upload-label">클릭하여 <span>사진 선택</span></label>
+          </div>
+          <div class="progress-bar" id="prog-financier-main"><div class="progress-fill" id="fill-financier-main"></div></div>
+          <div class="status-msg" id="status-financier-main"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVENT -->
+  <div class="tab-content" id="tab-event">
+    <div class="section-label">EVENT PAGE</div>
+    <div class="img-grid">
+      <div class="img-card">
+        <div class="img-preview"><img id="img-event-hero" src=""><div class="img-preview-placeholder">🎉</div></div>
+        <div class="img-card-body">
+          <div class="img-card-title">히어로 배경</div>
+          <div class="img-card-desc">이벤트 페이지 상단 배경 이미지</div>
+          <div class="img-card-key">event-bg.png</div>
+          <div class="upload-area" onclick="document.getElementById('file-event-hero').click()">
+            <input type="file" id="file-event-hero" accept="image/*" onchange="handleUpload(this,'event-hero','event-hero-img')">
+            <label class="upload-label">클릭하여 <span>사진 선택</span></label>
+          </div>
+          <div class="progress-bar" id="prog-event-hero"><div class="progress-fill" id="fill-event-hero"></div></div>
+          <div class="status-msg" id="status-event-hero"></div>
+        </div>
+      </div>
+      <div class="img-card">
+        <div class="img-preview"><img id="img-event-about" src=""><div class="img-preview-placeholder">🎉</div></div>
+        <div class="img-card-body">
+          <div class="img-card-title">상세 설명 이미지</div>
+          <div class="img-card-desc">이벤트 상세 설명 섹션 이미지</div>
+          <div class="img-card-key">event-about.png</div>
+          <div class="upload-area" onclick="document.getElementById('file-event-about').click()">
+            <input type="file" id="file-event-about" accept="image/*" onchange="handleUpload(this,'event-about','event-about-img')">
+            <label class="upload-label">클릭하여 <span>사진 선택</span></label>
+          </div>
+          <div class="progress-bar" id="prog-event-about"><div class="progress-fill" id="fill-event-about"></div></div>
+          <div class="status-msg" id="status-event-about"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getStorage, ref, uploadBytesResumable, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const ADMIN_EMAIL = 'ljh200048@github.com'; // ⚠️ 관리자 이메일로 변경해주세요
+
+  const app = initializeApp({
+    apiKey: "AIzaSyBl9jwmiIQnDjeobk9GBE5I0GO05ONPo6E",
+    authDomain: "sucre-cafe.firebaseapp.com",
+    projectId: "sucre-cafe",
+    storageBucket: "sucre-cafe.firebasestorage.app",
+    messagingSenderId: "1014358894897",
+    appId: "1:1014358894897:web:ce72ad3e9a8a8e95e96810"
+  });
+
+  const auth    = getAuth(app);
+  const storage = getStorage(app);
+  const db      = getFirestore(app);
+
+  // 관리자 이메일 목록 (여러 명 추가 가능)
+  const ADMIN_EMAILS = ['ljh200048@github.com'];
+
+  onAuthStateChanged(auth, async user => {
+    if (user) {
+      document.getElementById('loginWrap').style.display = 'none';
+      document.getElementById('adminWrap').style.display = 'block';
+      document.getElementById('navUser').textContent = user.email;
+      document.getElementById('logoutBtn').style.display = 'block';
+      loadAllImages();
+    } else {
+      document.getElementById('loginWrap').style.display = 'flex';
+      document.getElementById('adminWrap').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'none';
+    }
+  });
+
+  window.adminLogin = async () => {
+    const email = document.getElementById('adminEmail').value.trim();
+    const pw    = document.getElementById('adminPw').value;
+    const errEl = document.getElementById('loginError');
+    errEl.style.display = 'none';
+    try {
+      await signInWithEmailAndPassword(auth, email, pw);
+    } catch (e) {
+      errEl.textContent = '이메일 또는 비밀번호가 틀렸어요.';
+      errEl.style.display = 'block';
+    }
+  };
+
+  window.logout = async () => {
+    await signOut(auth);
+  };
+
+  window.switchTab = (name) => {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', t.textContent.trim() === {
+        home:'홈', macaron:'마카롱', strawberry:'딸기 쇼트케이크',
+        croffle:'크로플', latte:'시그니처 라떼', tart:'시즌 타르트',
+        financier:'피낭시에', event:'이벤트'
+      }[name]);
+    });
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+  };
+
+  // 기존 이미지 URL 불러오기
+  async function loadAllImages() {
+    const snap = await getDoc(doc(db, 'settings', 'images'));
+    if (!snap.exists()) return;
+    const data = snap.data();
+    Object.entries(data).forEach(([key, url]) => {
+      const imgEl = document.getElementById('img-' + key);
+      if (imgEl && url) {
+        imgEl.src = url;
+        imgEl.style.display = 'block';
+        const placeholder = imgEl.nextElementSibling;
+        if (placeholder) placeholder.style.display = 'none';
+      }
+    });
+  }
+
+  // 이미지 업로드
+  window.handleUpload = async (input, key, imgId) => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const progBar  = document.getElementById('prog-' + key);
+    const fill     = document.getElementById('fill-' + key);
+    const statusEl = document.getElementById('status-' + key);
+    const imgEl    = document.getElementById('img-' + imgId.replace('-img','').replace('img-',''));
+
+    progBar.style.display = 'block';
+    statusEl.style.display = 'none';
+
+    // 미리보기
+    const reader = new FileReader();
+    reader.onload = e => {
+      const allImgs = document.querySelectorAll(`[id^="img-"]`);
+      allImgs.forEach(img => {
+        if (img.id === 'img-' + key) {
+          img.src = e.target.result;
+          img.style.display = 'block';
+          const ph = img.nextElementSibling;
+          if (ph) ph.style.display = 'none';
+        }
+      });
+    };
+    reader.readAsDataURL(file);
+
+    // Firebase Storage 업로드
+    const storageRef = ref(storage, `images/${key}`);
+    const task = uploadBytesResumable(storageRef, file);
+
+    task.on('state_changed',
+      snap => {
+        const pct = (snap.bytesTransferred / snap.totalBytes) * 100;
+        fill.style.width = pct + '%';
+      },
+      err => {
+        statusEl.className = 'status-msg error';
+        statusEl.textContent = '❌ 업로드 실패: ' + err.message;
+        statusEl.style.display = 'block';
+        progBar.style.display = 'none';
+      },
+      async () => {
+        const url = await getDownloadURL(task.snapshot.ref);
+        // Firestore에 URL 저장
+        await setDoc(doc(db, 'settings', 'images'), { [key]: url }, { merge: true });
+        progBar.style.display = 'none';
+        statusEl.className = 'status-msg success';
+        statusEl.textContent = '✅ 업로드 완료!';
+        statusEl.style.display = 'block';
+      }
+    );
+  };
+
+  // 엔터키 로그인
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && document.getElementById('loginWrap').style.display !== 'none') {
+      window.adminLogin();
+    }
+  });
+</script>
+</body>
+</html>
