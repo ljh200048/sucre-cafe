@@ -305,6 +305,10 @@
       <input type="tel" id="appPhone" placeholder="010-0000-0000" required>
     </div>
     <div class="field">
+      <label>이메일 * (확인 메일 수신)</label>
+      <input type="email" id="appEmail" placeholder="example@email.com" required>
+    </div>
+    <div class="field">
       <label>시식 메뉴 선택 *</label>
       <select id="appMenu">
         <option value="">선택해주세요</option>
@@ -425,13 +429,14 @@
   async function submitApply() {
     const name  = document.getElementById('appName').value.trim();
     const phone = document.getElementById('appPhone').value.trim();
+    const email = document.getElementById('appEmail').value.trim();
     const menu  = document.getElementById('appMenu').value;
     const resultEl = document.getElementById('applyResult');
     const btn = document.getElementById('applyBtn');
 
-    if (!name || !phone || !menu) {
+    if (!name || !phone || !email || !menu) {
       resultEl.className = 'result-msg error';
-      resultEl.textContent = '❌ 이름, 연락처, 메뉴를 모두 입력해주세요.';
+      resultEl.textContent = '❌ 모든 항목을 입력해주세요.';
       resultEl.style.display = 'block';
       return;
     }
@@ -442,7 +447,7 @@
     try {
       await emailjs.send('service_aorhmtg', 'template_u2duq02', {
         to_name:     name,
-        to_email:    'sucre@example.com',
+        to_email:    email,
         phone:       phone,
         menu_list:   `[무료 시식 이벤트 신청]\n이름: ${name}\n연락처: ${phone}\n시식 메뉴: ${menu}`,
         total:       '무료',
@@ -454,7 +459,7 @@
         request:     '없음',
       });
       resultEl.className = 'result-msg success';
-      resultEl.innerHTML = `🎉 신청 완료! <strong>${name}</strong>님, 곧 연락드릴게요 😊`;
+      resultEl.innerHTML = `🎉 신청 완료! <strong>${email}</strong>로 확인 메일을 보내드렸어요. 곧 연락드릴게요 😊`;
       resultEl.style.display = 'block';
       btn.textContent = '신청 완료 ✓';
       const rem = document.getElementById('remainCount');
