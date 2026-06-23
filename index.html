@@ -101,19 +101,8 @@
   .rc-author { display: flex; justify-content: space-between; font-size: 12px; color: #aaa; letter-spacing: 0.02em; }
   .rc-product { color: #b8975a; }
 
-  /* MAP / VISIT SECTION */
-  .visit-section { display: grid; grid-template-columns: 1fr 1fr; border-top: 0.5px solid #e0ddd8; }
-  .visit-map { background: linear-gradient(145deg, #e8e8e0, #d4d4c4); min-height: 320px; display: flex; align-items: center; justify-content: center; font-size: 48px; position: relative; }
-  .visit-map-label { position: absolute; bottom: 24px; left: 24px; background: #fff; padding: 10px 16px; font-size: 12px; color: #1a1a1a; letter-spacing: 0.04em; border: 0.5px solid #e0ddd8; }
-  .visit-info { padding: 48px 48px; display: flex; flex-direction: column; justify-content: center; border-left: 0.5px solid #e0ddd8; }
-  .visit-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 400; margin-bottom: 28px; }
-  .visit-row { display: flex; gap: 16px; margin-bottom: 18px; align-items: flex-start; }
-  .vr-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
-  .vr-label { font-size: 11px; letter-spacing: 0.08em; color: #b8975a; margin-bottom: 3px; }
-  .vr-val { font-size: 14px; color: #1a1a1a; line-height: 1.6; }
-  .visit-sns { display: flex; gap: 12px; margin-top: 28px; }
-  .sns-btn { padding: 9px 20px; border: 0.5px solid #d8d4cc; font-size: 12px; font-family: 'Cormorant Garamond', serif; color: #666; cursor: pointer; letter-spacing: 0.06em; text-decoration: none; transition: all 0.15s; }
-  .sns-btn:hover { border-color: #1a1a1a; color: #1a1a1a; }
+  /* EXTENDED REVIEW */
+  .review-more-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 24px; }
 
   /* FOOTER */
   footer { padding: 44px 40px 28px; border-top: 0.5px solid #e0ddd8; background: #faf9f7; }
@@ -139,11 +128,12 @@
     .hero-right { grid-template-rows: auto auto; }
     .hero-left { min-height: 320px; }
     .product-grid { grid-template-columns: 1fr 1fr; }
-    .about-section, .visit-section { grid-template-columns: 1fr; }
+    .about-section { grid-template-columns: 1fr; }
     .about-img { min-height: 220px; }
     .info-strip { grid-template-columns: 1fr; }
     .info-block { border-right: none; border-bottom: 0.5px solid #e0ddd8; }
     .review-grid { grid-template-columns: 1fr; }
+    #help { padding-left: 20px !important; padding-right: 20px !important; }
     .section-header, .review-strip { padding-left: 20px; padding-right: 20px; }
     .about-text, .visit-info { padding: 36px 20px; }
     .footer-top { flex-direction: column; gap: 24px; }
@@ -388,39 +378,42 @@
   </div>
 </div>
 
-<!-- VISIT / MAP -->
-<div id="help" class="visit-section">
-  <div class="visit-map">
-    🗺️
-    <div class="visit-map-label">📍 충북 청주시 상당구 어딘가 123</div>
+<!-- EXTENDED REVIEWS -->
+<div id="help" style="padding: 0 40px 64px; border-top: 0.5px solid #e0ddd8;">
+  <div class="section-header" style="padding: 48px 0 28px;">
+    <div class="section-title">More Reviews</div>
+    <span style="font-size:13px;color:#b8975a;letter-spacing:.06em">★★★★★ &nbsp;4.9 / 5.0 · 총 671개</span>
   </div>
-  <div class="visit-info">
-    <div class="visit-title">Visit Sucré</div>
-    <div class="visit-row">
-      <div class="vr-icon">📍</div>
-      <div>
-        <div class="vr-label">ADDRESS</div>
-        <div class="vr-val">충북 청주시 상당구 어딘가 123</div>
-      </div>
+  <div class="review-grid">
+    <div class="review-card">
+      <div class="rc-stars">★★★★★</div>
+      <div class="rc-text">복숭아 타르트 먹었는데 미러 글레이즈가 너무 예뻐요. 맛도 달지 않고 딱 좋았어요. 포장도 감성적이라 선물하기 완벽해요!</div>
+      <div class="rc-author"><span>홍*연 · 2026.06.03</span><span class="rc-product">시즌 타르트</span></div>
     </div>
-    <div class="visit-row">
-      <div class="vr-icon">🕙</div>
-      <div>
-        <div class="vr-label">HOURS</div>
-        <div class="vr-val">평일 11:00 – 21:00<br>주말 10:00 – 22:00<br>매월 첫째 월요일 휴무</div>
-      </div>
+    <div class="review-card">
+      <div class="rc-stars">★★★★★</div>
+      <div class="rc-text">크로플 겉은 바삭하고 속은 촉촉해요! 버터 향이 가득해서 라떼랑 같이 먹었는데 조합이 완벽했어요. 매주 오고 싶어지는 집!</div>
+      <div class="rc-author"><span>강*민 · 2026.06.11</span><span class="rc-product">크로플</span></div>
     </div>
-    <div class="visit-row">
-      <div class="vr-icon">📞</div>
-      <div>
-        <div class="vr-label">CONTACT</div>
-        <div class="vr-val">043-000-0000<br>평일 AM10 – PM6</div>
-      </div>
+    <div class="review-card">
+      <div class="rc-stars">★★★★★</div>
+      <div class="rc-text">마카롱 5가지 다 맛있는데 얼그레이 향이 진짜 살아있어요. 10개입으로 다음엔 꼭 주문할 거예요. 포장도 너무 예뻐요!</div>
+      <div class="rc-author"><span>정*현 · 2026.06.05</span><span class="rc-product">마카롱 세트</span></div>
     </div>
-    <div class="visit-sns">
-      <a href="https://instagram.com" target="_blank" class="sns-btn">Instagram</a>
-      <a href="https://pf.kakao.com" target="_blank" class="sns-btn">KakaoTalk</a>
-      <a href="https://blog.naver.com" target="_blank" class="sns-btn">Naver Blog</a>
+    <div class="review-card">
+      <div class="rc-stars">★★★★★</div>
+      <div class="rc-text">피낭시에 다크 카카오 맛 속에 가나슈가 들어있다는 걸 모르고 먹다가 깜짝 놀랐어요! 12개 사서 회사에 가져갔는데 다들 극찬했어요.</div>
+      <div class="rc-author"><span>박*현 · 2026.06.15</span><span class="rc-product">피낭시에</span></div>
+    </div>
+    <div class="review-card">
+      <div class="rc-stars">★★★★★</div>
+      <div class="rc-text">귀리 우유 라떼 주문했는데 너무 고소하고 자스민 향이 은은하게 나요. 달지 않게 부탁했더니 에스프레소 향이 더 잘 살아서 좋았어요.</div>
+      <div class="rc-author"><span>임*나 · 2026.06.14</span><span class="rc-product">시그니처 라떼</span></div>
+    </div>
+    <div class="review-card">
+      <div class="rc-stars">★★★★★</div>
+      <div class="rc-text">시즌마다 맛이 바뀐다는 게 너무 좋아요. 봄 딸기 타르트도 최고였고 여름 복숭아도 완벽해요. 가을 무화과 타르트가 벌써 기대돼요!</div>
+      <div class="rc-author"><span>문*준 · 2026.06.12</span><span class="rc-product">시즌 타르트</span></div>
     </div>
   </div>
 </div>
