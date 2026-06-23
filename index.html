@@ -15,6 +15,21 @@
   .nav-links { display: flex; gap: 28px; }
   .nav-links a { font-size: 13px; color: #666; text-decoration: none; letter-spacing: 0.07em; transition: color 0.15s; }
   .nav-links a:hover, .nav-links a.active { color: #1a1a1a; border-bottom: 1px solid #b8975a; padding-bottom: 2px; }
+  /* SEARCH BAR */
+  .search-bar { display: none; position: absolute; top: 65px; left: 0; right: 0; background: #fff; border-bottom: 0.5px solid #e0ddd8; padding: 16px 40px; z-index: 99; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+  .search-bar.open { display: flex; gap: 12px; align-items: center; }
+  .search-input { flex: 1; padding: 10px 16px; border: 0.5px solid #d8d4cc; font-family: 'Cormorant Garamond', serif; font-size: 15px; outline: none; border-radius: 1px; letter-spacing: 0.02em; }
+  .search-input:focus { border-color: #1a1a1a; }
+  .search-results { padding: 0 40px 32px; display: none; border-bottom: 0.5px solid #e0ddd8; }
+  .search-results.show { display: block; }
+  .sr-title { font-size: 11px; letter-spacing: 0.1em; color: #aaa; margin: 24px 0 14px; }
+  .sr-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .sr-card { border: 0.5px solid #e8e4e0; padding: 14px 16px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background 0.15s; }
+  .sr-card:hover { background: #faf8f5; border-color: #b8975a; }
+  .sr-emoji { font-size: 24px; }
+  .sr-name { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 400; margin-bottom: 2px; }
+  .sr-price { font-size: 12px; color: #b8975a; }
+  .sr-empty { font-size: 14px; color: #bbb; padding: 20px 0; letter-spacing: 0.02em; }
   .nav-icons { display: flex; gap: 18px; font-size: 18px; color: #666; cursor: pointer; }
 
   /* HERO */
@@ -151,10 +166,10 @@
     <a href="#review">Review</a>
     <a href="#help">Help Center</a>
   </div>
-  <div class="nav-icons">
-    <span title="검색">🔍</span>
-    <span title="위시리스트">♡</span>
-    <span title="장바구니">🛍</span>
+  <div class="nav-icons" style="align-items:center">
+    <span id="searchToggle" title="검색" style="cursor:pointer;font-size:18px" onclick="toggleSearch()">🔍</span>
+    <a href="wishlist.html" title="찜 목록" style="text-decoration:none;font-size:18px">♡</a>
+    <a href="login.html" id="navAuthBtn" style="font-size:12px;color:#666;text-decoration:none;letter-spacing:.06em;border:0.5px solid #d8d4cc;padding:5px 14px;font-family:'Cormorant Garamond',serif">로그인</a>
   </div>
 </nav>
 
@@ -185,6 +200,16 @@
 </div>
 
 <!-- TICKER -->
+<!-- SEARCH BAR -->
+<div class="search-bar" id="searchBar">
+  <input class="search-input" id="searchInput" placeholder="메뉴 이름을 검색해보세요... (예: 마카롱, 라떼)" oninput="doSearch(this.value)" autofocus>
+  <span style="font-size:18px;cursor:pointer;color:#aaa" onclick="closeSearch()">✕</span>
+</div>
+<div class="search-results" id="searchResults">
+  <div class="sr-title">검색 결과</div>
+  <div class="sr-grid" id="srGrid"></div>
+</div>
+
 <div class="ticker">
   <div class="ticker-inner">
     <span class="ticker-item">🍓 국내산 제철 재료</span>
@@ -218,7 +243,7 @@
 
   <div class="product-grid">
     <!-- Strawberry Shortcake -->
-    <div class="product-card" onclick="location.href='strawberry_shortcake.html'">
+    <div class="product-card" data-id="strawberry" onclick="location.href='strawberry_shortcake.html'">
       <div class="pc-img img-cake">
         <div class="pc-img-badge badge-gold">BEST SELLER</div>
         🍰
@@ -235,7 +260,7 @@
     </div>
 
     <!-- Macaron Set -->
-    <div class="product-card" onclick="location.href='macaron_set.html'">
+    <div class="product-card" data-id="macaron" onclick="location.href='macaron_set.html'">
       <div class="pc-img img-macaron">
         <div class="pc-img-badge badge-gold">SEASONAL</div>
         🍬
@@ -252,7 +277,7 @@
     </div>
 
     <!-- Croffle -->
-    <div class="product-card" onclick="location.href='croffle.html'">
+    <div class="product-card" data-id="croffle" onclick="location.href='croffle.html'">
       <div class="pc-img img-croffle">
         <div class="pc-img-badge badge-gold">TODAY'S PICK</div>
         🥐
@@ -269,7 +294,7 @@
     </div>
 
     <!-- Signature Latte -->
-    <div class="product-card" onclick="location.href='signature_latte.html'">
+    <div class="product-card" data-id="latte" onclick="location.href='signature_latte.html'">
       <div class="pc-img img-latte">
         <div class="pc-img-badge badge-gold">HOUSE BLEND</div>
         ☕
@@ -286,7 +311,7 @@
     </div>
 
     <!-- Seasonal Tart -->
-    <div class="product-card" onclick="location.href='seasonal_tart.html'">
+    <div class="product-card" data-id="tart" onclick="location.href='seasonal_tart.html'">
       <div class="pc-img img-tart">
         <div class="pc-img-badge badge-green">JUNE LIMITED</div>
         🥧
@@ -303,7 +328,7 @@
     </div>
 
     <!-- Financier -->
-    <div class="product-card" onclick="location.href='financier.html'">
+    <div class="product-card" data-id="financier" onclick="location.href='financier.html'">
       <div class="pc-img img-financier">
         <div class="pc-img-badge badge-gold">GIFT POPULAR</div>
         🍞
@@ -460,5 +485,120 @@
   </div>
 </footer>
 
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const app = initializeApp({
+    apiKey: "AIzaSyBl9jwmiIQnDjeobk9GBE5I0GO05ONPo6E",
+    authDomain: "sucre-cafe.firebaseapp.com",
+    projectId: "sucre-cafe",
+    storageBucket: "sucre-cafe.firebasestorage.app",
+    messagingSenderId: "1014358894897",
+    appId: "1:1014358894897:web:ce72ad3e9a8a8e95e96810"
+  });
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+  let currentUser = null;
+
+  onAuthStateChanged(auth, user => {
+    currentUser = user;
+    const btn = document.getElementById('navAuthBtn');
+    if (user) {
+      btn.textContent = (user.displayName || user.email.split('@')[0]) + ' · 로그아웃';
+      btn.onclick = async (e) => { e.preventDefault(); await signOut(auth); location.reload(); };
+    } else {
+      btn.textContent = '로그인';
+      btn.href = 'login.html';
+    }
+  });
+
+  // ── 검색 ────────────────────────────────────────────
+  const allMenus = [
+    { id:'strawberry', name:'딸기 쇼트케이크', alias:'Strawberry Shortcake 케이크 딸기', price:'₩ 7,500', emoji:'🍰', url:'strawberry_shortcake.html' },
+    { id:'macaron',    name:'마카롱 세트',       alias:'Macaron 마카롱 디저트',           price:'₩ 8,000', emoji:'🍬', url:'macaron_set.html' },
+    { id:'croffle',    name:'크로플',            alias:'Croffle 크루아상 와플',            price:'₩ 6,000', emoji:'🥐', url:'croffle.html' },
+    { id:'latte',      name:'시그니처 라떼',      alias:'Signature Latte 라떼 커피 음료',  price:'₩ 5,500', emoji:'☕', url:'signature_latte.html' },
+    { id:'tart',       name:'시즌 타르트',        alias:'Seasonal Tart 타르트 복숭아',     price:'₩ 6,500', emoji:'🥧', url:'seasonal_tart.html' },
+    { id:'financier',  name:'피낭시에',           alias:'Financier 피낭시에 구움과자',     price:'₩ 2,500~', emoji:'🍞', url:'financier.html' },
+  ];
+
+  window.toggleSearch = () => {
+    const bar = document.getElementById('searchBar');
+    const isOpen = bar.classList.toggle('open');
+    if (isOpen) { document.getElementById('searchInput').focus(); }
+    else { closeSearch(); }
+  };
+
+  window.closeSearch = () => {
+    document.getElementById('searchBar').classList.remove('open');
+    document.getElementById('searchResults').classList.remove('show');
+    document.getElementById('searchInput').value = '';
+  };
+
+  window.doSearch = (q) => {
+    const results = document.getElementById('searchResults');
+    const grid = document.getElementById('srGrid');
+    if (!q.trim()) { results.classList.remove('show'); return; }
+    const hits = allMenus.filter(m =>
+      m.name.includes(q) || m.alias.toLowerCase().includes(q.toLowerCase())
+    );
+    results.classList.add('show');
+    if (hits.length === 0) {
+      grid.innerHTML = '<div class="sr-empty">검색 결과가 없어요</div>';
+    } else {
+      grid.innerHTML = hits.map(m => `
+        <div class="sr-card" onclick="location.href='${m.url}'">
+          <div class="sr-emoji">${m.emoji}</div>
+          <div><div class="sr-name">${m.name}</div><div class="sr-price">${m.price}</div></div>
+        </div>
+      `).join('');
+    }
+  };
+
+  // ESC 로 검색 닫기
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSearch(); });
+
+  // ── 찜 기능 (상품 카드 하트) ─────────────────────────
+  async function getWishlist(uid) {
+    const snap = await getDoc(doc(db, 'wishlists', uid));
+    return snap.exists() ? (snap.data().items || []) : [];
+  }
+
+  async function toggleWish(id) {
+    if (!currentUser) { location.href = 'login.html'; return; }
+    const uid = currentUser.uid;
+    const ref = doc(db, 'wishlists', uid);
+    const items = await getWishlist(uid);
+    if (items.includes(id)) {
+      await setDoc(ref, { items: items.filter(i => i !== id) }, { merge: true });
+    } else {
+      await setDoc(ref, { items: arrayUnion(id) }, { merge: true });
+    }
+    renderHearts(uid);
+  }
+
+  async function renderHearts(uid) {
+    const items = uid ? await getWishlist(uid) : [];
+    document.querySelectorAll('.product-card').forEach(card => {
+      const id = card.dataset.id;
+      if (!id) return;
+      let btn = card.querySelector('.wish-heart');
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.className = 'wish-heart';
+        btn.style.cssText = 'position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.9);border:none;width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;';
+        btn.onclick = (e) => { e.stopPropagation(); toggleWish(id); };
+        card.style.position = 'relative';
+        card.appendChild(btn);
+      }
+      btn.textContent = items.includes(id) ? '♥' : '♡';
+      btn.style.color = items.includes(id) ? '#e05070' : '#999';
+    });
+  }
+
+  onAuthStateChanged(auth, user => { renderHearts(user ? user.uid : null); });
+</script>
 </body>
 </html>

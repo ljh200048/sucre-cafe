@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로그인 — Sucré</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Cormorant Garamond', serif; color: #1a1a1a; background: #faf9f7; min-height: 100vh; display: flex; flex-direction: column; }
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 40px; border-bottom: 0.5px solid #e0ddd8; background: #fff; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 400; letter-spacing: 0.04em; text-decoration: none; color: #1a1a1a; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { font-size: 13px; color: #666; text-decoration: none; letter-spacing: 0.07em; }
+  .nav-links a:hover { color: #1a1a1a; }
+
+  .auth-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 48px 20px; }
+  .auth-box { background: #fff; border: 0.5px solid #e0ddd8; padding: 48px 44px; width: 100%; max-width: 420px; }
+  .auth-logo { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 400; text-align: center; margin-bottom: 6px; letter-spacing: 0.04em; }
+  .auth-tagline { font-size: 13px; color: #aaa; text-align: center; letter-spacing: 0.04em; margin-bottom: 36px; }
+
+  /* TABS */
+  .auth-tabs { display: flex; border-bottom: 0.5px solid #e0ddd8; margin-bottom: 32px; }
+  .auth-tab { flex: 1; padding: 10px; text-align: center; font-size: 13px; letter-spacing: 0.08em; color: #aaa; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; margin-bottom: -0.5px; }
+  .auth-tab.active { color: #1a1a1a; border-bottom: 2px solid #1a1a1a; }
+
+  .auth-form { display: none; }
+  .auth-form.active { display: block; }
+
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 11px; letter-spacing: 0.1em; color: #999; margin-bottom: 7px; }
+  .field input { width: 100%; padding: 11px 14px; border: 0.5px solid #d8d4cc; font-family: 'Cormorant Garamond', serif; font-size: 14px; color: #1a1a1a; background: #fff; outline: none; border-radius: 1px; transition: border-color 0.15s; letter-spacing: 0.02em; }
+  .field input:focus { border-color: #1a1a1a; }
+
+  .auth-btn { width: 100%; padding: 13px; background: #1a1a1a; color: #fff; border: none; font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: 0.12em; cursor: pointer; margin-top: 8px; transition: background 0.2s; }
+  .auth-btn:hover { background: #333; }
+  .auth-btn:disabled { background: #999; cursor: not-allowed; }
+
+  .auth-error { font-size: 13px; color: #c03030; background: #fdf0f0; border: 0.5px solid #f0c0c0; padding: 10px 14px; margin-top: 14px; display: none; letter-spacing: 0.02em; }
+  .auth-success { font-size: 13px; color: #5a8a3a; background: #f0f8e8; border: 0.5px solid #c8e0a8; padding: 10px 14px; margin-top: 14px; display: none; letter-spacing: 0.02em; }
+
+  .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 0.5px; background: #e0ddd8; }
+  .divider span { font-size: 11px; color: #ccc; letter-spacing: 0.06em; }
+
+  .forgot { text-align: right; margin-top: -8px; margin-bottom: 16px; }
+  .forgot a { font-size: 12px; color: #aaa; text-decoration: underline; cursor: pointer; }
+  .forgot a:hover { color: #1a1a1a; }
+
+  footer { padding: 24px 40px; border-top: 0.5px solid #e0ddd8; background: #fff; }
+  .footer-biz { font-size: 12px; color: #999; line-height: 1.9; letter-spacing: 0.02em; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Sucré</a>
+  <div class="nav-links">
+    <a href="index.html">Overview</a>
+    <a href="index.html#shop">Online Shop</a>
+    <a href="wishlist.html">찜 목록</a>
+    <a href="order.html" style="color:#b8975a">주문하기</a>
+  </div>
+</nav>
+
+<div class="auth-wrap">
+  <div class="auth-box">
+    <div class="auth-logo">Sucré</div>
+    <div class="auth-tagline">달콤함이 머무는 공간</div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchTab('login')">로그인</div>
+      <div class="auth-tab" onclick="switchTab('signup')">회원가입</div>
+    </div>
+
+    <!-- 로그인 폼 -->
+    <div class="auth-form active" id="loginForm">
+      <div class="field">
+        <label>이메일</label>
+        <input type="email" id="loginEmail" placeholder="example@email.com">
+      </div>
+      <div class="field">
+        <label>비밀번호</label>
+        <input type="password" id="loginPassword" placeholder="비밀번호 입력">
+      </div>
+      <div class="forgot"><a onclick="resetPassword()">비밀번호 찾기</a></div>
+      <button class="auth-btn" onclick="login()">로그인</button>
+      <div class="auth-error" id="loginError"></div>
+      <div class="auth-success" id="loginSuccess"></div>
+    </div>
+
+    <!-- 회원가입 폼 -->
+    <div class="auth-form" id="signupForm">
+      <div class="field">
+        <label>이름</label>
+        <input type="text" id="signupName" placeholder="홍길동">
+      </div>
+      <div class="field">
+        <label>이메일</label>
+        <input type="email" id="signupEmail" placeholder="example@email.com">
+      </div>
+      <div class="field">
+        <label>비밀번호 (6자 이상)</label>
+        <input type="password" id="signupPassword" placeholder="비밀번호 입력">
+      </div>
+      <div class="field">
+        <label>비밀번호 확인</label>
+        <input type="password" id="signupPasswordConfirm" placeholder="비밀번호 재입력">
+      </div>
+      <button class="auth-btn" onclick="signup()">회원가입</button>
+      <div class="auth-error" id="signupError"></div>
+      <div class="auth-success" id="signupSuccess"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-biz">
+    Sucré &nbsp;|&nbsp; 대표: 홍길동 &nbsp;|&nbsp; 충북 청주시 상당구 어딘가 123 &nbsp;|&nbsp; 043-000-0000
+  </div>
+</footer>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBl9jwmiIQnDjeobk9GBE5I0GO05ONPo6E",
+    authDomain: "sucre-cafe.firebaseapp.com",
+    projectId: "sucre-cafe",
+    storageBucket: "sucre-cafe.firebasestorage.app",
+    messagingSenderId: "1014358894897",
+    appId: "1:1014358894897:web:ce72ad3e9a8a8e95e96810"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // 이미 로그인된 경우 메인으로
+  onAuthStateChanged(auth, user => {
+    if (user) location.href = 'index.html';
+  });
+
+  const errMsg = {
+    'auth/invalid-email': '이메일 형식이 올바르지 않아요.',
+    'auth/user-not-found': '등록되지 않은 이메일이에요.',
+    'auth/wrong-password': '비밀번호가 틀렸어요.',
+    'auth/email-already-in-use': '이미 사용 중인 이메일이에요.',
+    'auth/weak-password': '비밀번호는 6자 이상이어야 해요.',
+    'auth/invalid-credential': '이메일 또는 비밀번호가 틀렸어요.',
+  };
+
+  window.switchTab = (tab) => {
+    document.querySelectorAll('.auth-tab').forEach((t, i) => t.classList.toggle('active', (i === 0) === (tab === 'login')));
+    document.querySelectorAll('.auth-form').forEach((f, i) => f.classList.toggle('active', (i === 0) === (tab === 'login')));
+  };
+
+  window.login = async () => {
+    const email = document.getElementById('loginEmail').value.trim();
+    const pw    = document.getElementById('loginPassword').value;
+    const errEl = document.getElementById('loginError');
+    errEl.style.display = 'none';
+    try {
+      await signInWithEmailAndPassword(auth, email, pw);
+      location.href = 'index.html';
+    } catch (e) {
+      errEl.textContent = errMsg[e.code] || '로그인에 실패했어요. 다시 시도해주세요.';
+      errEl.style.display = 'block';
+    }
+  };
+
+  window.signup = async () => {
+    const name  = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const pw    = document.getElementById('signupPassword').value;
+    const pw2   = document.getElementById('signupPasswordConfirm').value;
+    const errEl = document.getElementById('signupError');
+    const sucEl = document.getElementById('signupSuccess');
+    errEl.style.display = 'none';
+    sucEl.style.display = 'none';
+
+    if (!name) { errEl.textContent = '이름을 입력해주세요.'; errEl.style.display = 'block'; return; }
+    if (pw !== pw2) { errEl.textContent = '비밀번호가 일치하지 않아요.'; errEl.style.display = 'block'; return; }
+
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, pw);
+      await updateProfile(cred.user, { displayName: name });
+      sucEl.textContent = '🎉 가입 완료! 로그인 중...';
+      sucEl.style.display = 'block';
+      setTimeout(() => location.href = 'index.html', 1200);
+    } catch (e) {
+      errEl.textContent = errMsg[e.code] || '가입에 실패했어요. 다시 시도해주세요.';
+      errEl.style.display = 'block';
+    }
+  };
+
+  window.resetPassword = async () => {
+    const email = document.getElementById('loginEmail').value.trim();
+    if (!email) { alert('이메일을 먼저 입력해주세요.'); return; }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      const sucEl = document.getElementById('loginSuccess');
+      sucEl.textContent = '📧 비밀번호 재설정 메일을 보냈어요!';
+      sucEl.style.display = 'block';
+    } catch (e) {
+      const errEl = document.getElementById('loginError');
+      errEl.textContent = errMsg[e.code] || '메일 발송에 실패했어요.';
+      errEl.style.display = 'block';
+    }
+  };
+
+  // 엔터키 지원
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    if (document.getElementById('loginForm').classList.contains('active')) window.login();
+    else window.signup();
+  });
+</script>
+</body>
+</html>

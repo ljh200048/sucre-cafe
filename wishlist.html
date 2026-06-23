@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>찜 목록 — Sucré</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Cormorant Garamond', serif; color: #1a1a1a; background: #fff; }
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 40px; border-bottom: 0.5px solid #e0ddd8; position: sticky; top: 0; background: rgba(255,255,255,0.96); backdrop-filter: blur(8px); z-index: 100; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 400; letter-spacing: 0.04em; text-decoration: none; color: #1a1a1a; }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a { font-size: 13px; color: #666; text-decoration: none; letter-spacing: 0.07em; }
+  .nav-links a:hover { color: #1a1a1a; }
+  .nav-links a.active { color: #1a1a1a; border-bottom: 1px solid #b8975a; padding-bottom: 2px; }
+
+  .breadcrumb { padding: 14px 40px; font-size: 12px; color: #aaa; letter-spacing: 0.04em; display: flex; gap: 8px; align-items: center; border-bottom: 0.5px solid #f0ede8; }
+  .breadcrumb a { color: #aaa; text-decoration: none; }
+  .breadcrumb .sep { color: #ddd; }
+  .breadcrumb .current { color: #1a1a1a; }
+
+  .page-header { padding: 48px 40px 32px; border-bottom: 0.5px solid #e0ddd8; display: flex; justify-content: space-between; align-items: baseline; }
+  .page-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; }
+  .page-count { font-size: 13px; color: #aaa; letter-spacing: 0.04em; }
+
+  .wish-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #e8e4e0; border-top: 0.5px solid #e8e4e0; border-bottom: 0.5px solid #e8e4e0; min-height: 300px; }
+  .wish-card { background: #fff; cursor: pointer; transition: background 0.15s; overflow: hidden; position: relative; }
+  .wish-card:hover { background: #faf8f5; }
+  .wc-img { height: 200px; display: flex; align-items: center; justify-content: center; font-size: 52px; }
+  .wc-body { padding: 18px 20px 22px; border-top: 0.5px solid #e8e4e0; }
+  .wc-cat { font-size: 10px; letter-spacing: 0.12em; color: #bbb; margin-bottom: 4px; }
+  .wc-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 400; margin-bottom: 10px; }
+  .wc-footer { display: flex; justify-content: space-between; align-items: center; }
+  .wc-price { font-size: 15px; color: #1a1a1a; }
+  .wc-remove { font-size: 12px; color: #ccc; border: 0.5px solid #e8e4e0; padding: 5px 12px; background: none; cursor: pointer; font-family: inherit; letter-spacing: 0.04em; transition: all 0.15s; }
+  .wc-remove:hover { border-color: #c03030; color: #c03030; }
+  .heart-btn { position: absolute; top: 14px; right: 14px; font-size: 20px; background: rgba(255,255,255,0.9); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+  .wish-order-btn { display: block; width: calc(100% - 80px); margin: 32px auto; padding: 14px; background: #1a1a1a; color: #fff; border: none; font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: 0.12em; cursor: pointer; text-align: center; text-decoration: none; transition: background 0.2s; }
+  .wish-order-btn:hover { background: #333; }
+
+  .empty-state { padding: 80px 40px; text-align: center; }
+  .empty-icon { font-size: 48px; margin-bottom: 20px; opacity: 0.3; }
+  .empty-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 400; margin-bottom: 10px; color: #999; }
+  .empty-sub { font-size: 14px; color: #bbb; margin-bottom: 28px; letter-spacing: 0.02em; }
+  .empty-btn { display: inline-block; padding: 11px 28px; border: 0.5px solid #1a1a1a; font-family: 'Cormorant Garamond', serif; font-size: 13px; letter-spacing: 0.08em; color: #1a1a1a; text-decoration: none; transition: all 0.15s; }
+  .empty-btn:hover { background: #1a1a1a; color: #fff; }
+
+  .login-required { padding: 80px 40px; text-align: center; }
+  .lr-icon { font-size: 40px; margin-bottom: 20px; }
+  .lr-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 400; margin-bottom: 10px; }
+  .lr-sub { font-size: 14px; color: #999; margin-bottom: 28px; }
+  .lr-btn { display: inline-block; padding: 12px 32px; background: #1a1a1a; color: #fff; font-family: 'Cormorant Garamond', serif; font-size: 13px; letter-spacing: 0.1em; text-decoration: none; }
+
+  footer { padding: 36px 40px 24px; border-top: 0.5px solid #e0ddd8; background: #faf9f7; }
+  .footer-biz { font-size: 12px; color: #999; line-height: 1.9; }
+
+  @media (max-width: 768px) {
+    nav { padding: 18px 20px; }
+    .nav-links { gap: 16px; }
+    .wish-grid { grid-template-columns: 1fr 1fr; }
+    .page-header, .breadcrumb { padding-left: 20px; padding-right: 20px; }
+    footer { padding: 28px 20px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Sucré</a>
+  <div class="nav-links">
+    <a href="index.html">Overview</a>
+    <a href="index.html#shop">Online Shop</a>
+    <a href="wishlist.html" class="active">찜 ♡</a>
+    <a href="order.html" style="color:#b8975a">주문하기</a>
+    <a href="#" id="navUser" onclick="handleNavUser(event)" style="font-size:13px;color:#666"></a>
+  </div>
+</nav>
+
+<div class="breadcrumb">
+  <a href="index.html">Overview</a>
+  <span class="sep">›</span>
+  <span class="current">찜 목록</span>
+</div>
+
+<div id="loginRequired" class="login-required" style="display:none">
+  <div class="lr-icon">🔐</div>
+  <div class="lr-title">로그인이 필요해요</div>
+  <div class="lr-sub">찜 목록은 로그인 후 이용할 수 있어요</div>
+  <a href="login.html" class="lr-btn">로그인 / 회원가입</a>
+</div>
+
+<div id="wishContent" style="display:none">
+  <div class="page-header">
+    <div class="page-title">찜 목록</div>
+    <div class="page-count" id="wishCount">0개</div>
+  </div>
+
+  <div id="wishGrid" class="wish-grid"></div>
+  <div id="emptyState" class="empty-state" style="display:none">
+    <div class="empty-icon">♡</div>
+    <div class="empty-title">아직 찜한 메뉴가 없어요</div>
+    <div class="empty-sub">마음에 드는 메뉴에 ♡를 눌러보세요</div>
+    <a href="index.html#shop" class="empty-btn">메뉴 보러 가기</a>
+  </div>
+  <a href="order.html" class="wish-order-btn" id="orderBtn" style="display:none">찜한 메뉴 주문하기</a>
+</div>
+
+<footer>
+  <div class="footer-biz">Sucré &nbsp;|&nbsp; 충북 청주시 상당구 어딘가 123 &nbsp;|&nbsp; 043-000-0000</div>
+</footer>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const app = initializeApp({
+    apiKey: "AIzaSyBl9jwmiIQnDjeobk9GBE5I0GO05ONPo6E",
+    authDomain: "sucre-cafe.firebaseapp.com",
+    projectId: "sucre-cafe",
+    storageBucket: "sucre-cafe.firebasestorage.app",
+    messagingSenderId: "1014358894897",
+    appId: "1:1014358894897:web:ce72ad3e9a8a8e95e96810"
+  });
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const menuData = {
+    'strawberry': { name: 'Strawberry Shortcake', cat: 'DESSERT · CAKE', price: '₩ 7,500', emoji: '🍰', bg: 'linear-gradient(145deg,#ede4d8,#c8b098)', url: 'strawberry_shortcake.html' },
+    'macaron':    { name: 'Macaron Set', cat: 'DESSERT · MACARON', price: '₩ 8,000', emoji: '🍬', bg: 'linear-gradient(145deg,#f0e8f4,#d4b8e8)', url: 'macaron_set.html' },
+    'croffle':    { name: 'Croffle', cat: 'DESSERT · WAFFLE', price: '₩ 6,000', emoji: '🥐', bg: 'linear-gradient(145deg,#f5ede0,#d8c080)', url: 'croffle.html' },
+    'latte':      { name: 'Signature Latte', cat: 'BEVERAGE · COFFEE', price: '₩ 5,500', emoji: '☕', bg: 'linear-gradient(145deg,#2c1c0c,#6a4520)', url: 'signature_latte.html' },
+    'tart':       { name: 'Seasonal Tart', cat: 'DESSERT · TART', price: '₩ 6,500', emoji: '🥧', bg: 'linear-gradient(145deg,#e8f0e0,#b8d888)', url: 'seasonal_tart.html' },
+    'financier':  { name: 'Financier', cat: 'PÂTISSERIE', price: '₩ 2,500~', emoji: '🍞', bg: 'linear-gradient(145deg,#1c1408,#6a4e1c)', url: 'financier.html' },
+  };
+
+  let currentUser = null;
+
+  onAuthStateChanged(auth, async user => {
+    if (!user) {
+      document.getElementById('loginRequired').style.display = 'block';
+      document.getElementById('navUser').textContent = '로그인';
+      document.getElementById('navUser').href = 'login.html';
+      return;
+    }
+    currentUser = user;
+    document.getElementById('navUser').textContent = (user.displayName || user.email.split('@')[0]) + ' · 로그아웃';
+    document.getElementById('wishContent').style.display = 'block';
+    loadWishlist(user.uid);
+  });
+
+  window.handleNavUser = async (e) => {
+    if (currentUser) {
+      e.preventDefault();
+      await signOut(auth);
+      location.href = 'index.html';
+    }
+  };
+
+  async function loadWishlist(uid) {
+    const ref = doc(db, 'wishlists', uid);
+    const snap = await getDoc(ref);
+    const items = snap.exists() ? (snap.data().items || []) : [];
+    renderWishlist(items, uid);
+  }
+
+  function renderWishlist(items, uid) {
+    const grid = document.getElementById('wishGrid');
+    const empty = document.getElementById('emptyState');
+    const orderBtn = document.getElementById('orderBtn');
+    const count = document.getElementById('wishCount');
+
+    grid.innerHTML = '';
+    count.textContent = items.length + '개';
+
+    if (items.length === 0) {
+      empty.style.display = 'block';
+      orderBtn.style.display = 'none';
+      return;
+    }
+    empty.style.display = 'none';
+    orderBtn.style.display = 'block';
+
+    items.forEach(id => {
+      const m = menuData[id];
+      if (!m) return;
+      const card = document.createElement('div');
+      card.className = 'wish-card';
+      card.innerHTML = `
+        <div class="wc-img" style="background:${m.bg}" onclick="location.href='${m.url}'">${m.emoji}</div>
+        <div class="wc-body">
+          <div class="wc-cat">${m.cat}</div>
+          <div class="wc-name">${m.name}</div>
+          <div class="wc-footer">
+            <span class="wc-price">${m.price}</span>
+            <button class="wc-remove" onclick="removeWish('${id}', '${uid}')">찜 해제</button>
+          </div>
+        </div>
+        <button class="heart-btn">♥</button>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  window.removeWish = async (itemId, uid) => {
+    const ref = doc(db, 'wishlists', uid);
+    await updateDoc(ref, { items: arrayRemove(itemId) });
+    loadWishlist(uid);
+  };
+</script>
+</body>
+</html>
