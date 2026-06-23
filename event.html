@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event — Sucré</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Cormorant Garamond', serif; color: #1a1a1a; background: #fff; font-size: 15px; line-height: 1.7; }
+
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 40px; border-bottom: 0.5px solid #e0ddd8; position: sticky; top: 0; background: rgba(255,255,255,0.96); backdrop-filter: blur(8px); z-index: 100; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 400; letter-spacing: 0.04em; text-decoration: none; color: #1a1a1a; }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a { font-size: 13px; color: #666; text-decoration: none; letter-spacing: 0.07em; }
+  .nav-links a:hover { color: #1a1a1a; }
+  .nav-links a.active { color: #1a1a1a; border-bottom: 1px solid #b8975a; padding-bottom: 2px; }
+  .nav-icons { display: flex; gap: 14px; align-items: center; }
+  .nav-icons a { text-decoration: none; font-size: 18px; color: #666; }
+  .nav-auth { font-size: 12px; color: #666; text-decoration: none; letter-spacing: .06em; border: 0.5px solid #d8d4cc; padding: 5px 14px; font-family: 'Cormorant Garamond', serif; }
+
+  .breadcrumb { padding: 14px 40px; font-size: 12px; color: #aaa; letter-spacing: 0.04em; display: flex; gap: 8px; align-items: center; border-bottom: 0.5px solid #f0ede8; }
+  .breadcrumb a { color: #aaa; text-decoration: none; }
+  .breadcrumb .sep { color: #ddd; }
+  .breadcrumb .current { color: #1a1a1a; }
+
+  /* HERO */
+  .event-hero {
+    background: linear-gradient(150deg, #1a0f08 0%, #3a2010 35%, #6a3e20 65%, #9a6030 100%);
+    padding: 80px 40px; text-align: center; position: relative; overflow: hidden;
+  }
+  .event-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 32px, rgba(255,255,255,0.015) 32px, rgba(255,255,255,0.015) 33px);
+  }
+  .event-badge { display: inline-block; font-size: 10px; letter-spacing: 0.14em; color: #d4a84a; border: 0.5px solid rgba(212,168,74,0.5); padding: 5px 16px; margin-bottom: 20px; position: relative; z-index: 1; }
+  .event-title { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 400; color: #fff; line-height: 1.25; margin-bottom: 14px; position: relative; z-index: 1; }
+  .event-sub { font-size: 15px; color: rgba(255,255,255,0.55); letter-spacing: 0.04em; margin-bottom: 32px; position: relative; z-index: 1; }
+  .event-hero-meta { display: flex; justify-content: center; gap: 40px; position: relative; z-index: 1; }
+  .ehm-item { text-align: center; }
+  .ehm-label { font-size: 10px; letter-spacing: 0.12em; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+  .ehm-val { font-family: 'Playfair Display', serif; font-size: 18px; color: #fff; font-weight: 400; }
+
+  /* COUNTDOWN */
+  .countdown-wrap { background: #faf7f2; border-top: 0.5px solid #e8e0d0; border-bottom: 0.5px solid #e8e0d0; padding: 28px 40px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+  .cd-label { font-size: 12px; letter-spacing: 0.08em; color: #999; margin-right: 16px; }
+  .cd-box { text-align: center; }
+  .cd-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; color: #1a1a1a; min-width: 52px; display: inline-block; }
+  .cd-unit { font-size: 10px; letter-spacing: 0.1em; color: #bbb; display: block; }
+  .cd-sep { font-family: 'Playfair Display', serif; font-size: 24px; color: #d4a84a; padding: 0 4px; align-self: flex-start; margin-top: 4px; }
+
+  /* EVENT DETAIL */
+  .event-detail { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 0.5px solid #e0ddd8; }
+  .ed-text { padding: 60px 48px; border-right: 0.5px solid #e0ddd8; }
+  .ed-label { font-size: 10px; letter-spacing: 0.14em; color: #b8975a; margin-bottom: 16px; }
+  .ed-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 400; margin-bottom: 18px; line-height: 1.35; }
+  .ed-body { font-size: 15px; color: #666; line-height: 2.1; letter-spacing: 0.02em; margin-bottom: 28px; }
+  .ed-items { display: flex; flex-direction: column; gap: 12px; }
+  .ed-item { display: flex; gap: 14px; align-items: flex-start; }
+  .ed-dot { width: 6px; height: 6px; border-radius: 50%; background: #d4a84a; flex-shrink: 0; margin-top: 9px; }
+  .ed-item-text { font-size: 14px; color: #555; line-height: 1.7; letter-spacing: 0.02em; }
+  .ed-img { background: linear-gradient(150deg, #e8ddd0, #d0c0a0); display: flex; align-items: center; justify-content: center; font-size: 80px; min-height: 360px; }
+
+  /* MENU LINEUP */
+  .lineup-section { padding: 64px 40px; border-bottom: 0.5px solid #e0ddd8; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 23px; font-weight: 400; margin-bottom: 8px; }
+  .section-sub { font-size: 14px; color: #999; letter-spacing: 0.02em; margin-bottom: 36px; }
+  .lineup-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #e8e4e0; border: 0.5px solid #e8e4e0; }
+  .lineup-card { background: #fff; padding: 28px 24px; }
+  .lc-img { font-size: 36px; margin-bottom: 14px; }
+  .lc-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 400; margin-bottom: 5px; color: #1a1a1a; }
+  .lc-desc { font-size: 13px; color: #999; line-height: 1.7; letter-spacing: 0.02em; margin-bottom: 10px; }
+  .lc-tag { display: inline-block; font-size: 10px; letter-spacing: 0.1em; color: #5a8a3a; background: #f0f8e8; border: 0.5px solid #c8e0a8; padding: 3px 10px; border-radius: 1px; }
+
+  /* HOW TO APPLY */
+  .how-section { padding: 64px 40px; background: #faf9f7; border-bottom: 0.5px solid #e0ddd8; }
+  .how-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #e8e4e0; border: 0.5px solid #e8e4e0; margin-top: 36px; }
+  .how-step { background: #fff; padding: 28px 22px; }
+  .hs-num { font-family: 'Playfair Display', serif; font-size: 30px; color: #e8d4b0; line-height: 1; margin-bottom: 12px; }
+  .hs-title { font-size: 14px; font-weight: 500; margin-bottom: 8px; color: #1a1a1a; letter-spacing: 0.02em; }
+  .hs-body { font-size: 13px; color: #999; line-height: 1.75; letter-spacing: 0.02em; }
+
+  /* APPLY FORM */
+  .apply-section { display: grid; grid-template-columns: 1fr 400px; border-top: 0.5px solid #e0ddd8; }
+  .apply-form-wrap { padding: 60px 48px; border-right: 0.5px solid #e0ddd8; }
+  .apply-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 400; margin-bottom: 6px; }
+  .apply-sub { font-size: 14px; color: #999; letter-spacing: 0.02em; margin-bottom: 36px; }
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 11px; letter-spacing: 0.1em; color: #999; margin-bottom: 7px; }
+  .field input, .field select, .field textarea { width: 100%; padding: 11px 14px; border: 0.5px solid #d8d4cc; font-family: 'Cormorant Garamond', serif; font-size: 14px; color: #1a1a1a; background: #fff; outline: none; border-radius: 1px; transition: border-color 0.15s; letter-spacing: 0.02em; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: #1a1a1a; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .submit-btn { width: 100%; padding: 14px; background: #1a1a1a; color: #fff; border: none; font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: 0.12em; cursor: pointer; margin-top: 8px; transition: background 0.2s; }
+  .submit-btn:hover { background: #333; }
+  .submit-btn:disabled { background: #999; cursor: not-allowed; }
+  .result-msg { display: none; padding: 14px 18px; margin-top: 14px; font-size: 14px; letter-spacing: 0.02em; border-radius: 1px; }
+  .result-msg.success { background: #f0f8e8; border: 0.5px solid #c8e0a8; color: #5a8a3a; }
+  .result-msg.error { background: #fdf0f0; border: 0.5px solid #f0c0c0; color: #c03030; }
+
+  /* SIDEBAR */
+  .apply-sidebar { padding: 60px 40px; background: #faf9f7; display: flex; flex-direction: column; gap: 0; }
+  .sb-block { margin-bottom: 36px; }
+  .sb-label { font-size: 10px; letter-spacing: 0.14em; color: #b8975a; margin-bottom: 12px; }
+  .sb-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 400; margin-bottom: 10px; }
+  .sb-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; font-size: 13px; color: #666; line-height: 1.7; }
+  .sb-icon { flex-shrink: 0; font-size: 14px; }
+  .notice-box { background: #fff; border: 0.5px solid #e8e4e0; padding: 20px; margin-top: 4px; }
+  .notice-title { font-size: 11px; letter-spacing: 0.1em; color: #b8975a; margin-bottom: 12px; }
+  .notice-item { font-size: 12px; color: #999; line-height: 1.85; display: flex; gap: 8px; margin-bottom: 4px; }
+
+  /* PAST EVENTS */
+  .past-section { padding: 64px 40px; border-top: 0.5px solid #e0ddd8; }
+  .past-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 32px; }
+  .past-card { border: 0.5px solid #e8e4e0; overflow: hidden; }
+  .past-img { height: 140px; display: flex; align-items: center; justify-content: center; font-size: 44px; }
+  .past-body { padding: 18px 20px; }
+  .past-date { font-size: 11px; letter-spacing: 0.08em; color: #b8975a; margin-bottom: 6px; }
+  .past-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 400; margin-bottom: 5px; }
+  .past-result { font-size: 12px; color: #999; }
+  .past-ended { display: inline-block; font-size: 10px; letter-spacing: 0.1em; color: #aaa; border: 0.5px solid #e0ddd8; padding: 2px 8px; margin-top: 8px; }
+
+  footer { padding: 44px 40px 28px; border-top: 0.5px solid #e0ddd8; background: #faf9f7; }
+  .footer-biz { font-size: 12px; color: #999; line-height: 2; letter-spacing: 0.02em; }
+  .footer-links { display: flex; gap: 14px; margin-top: 12px; }
+  .footer-links a { font-size: 12px; color: #bbb; text-decoration: underline; }
+
+  @media (max-width: 768px) {
+    nav { padding: 18px 20px; }
+    .nav-links { display: none; }
+    .event-hero { padding: 56px 20px; }
+    .event-title { font-size: 28px; }
+    .event-hero-meta { gap: 24px; }
+    .event-detail, .apply-section { grid-template-columns: 1fr; }
+    .ed-text { padding: 36px 20px; border-right: none; border-bottom: 0.5px solid #e0ddd8; }
+    .apply-form-wrap { padding: 36px 20px; border-right: none; }
+    .apply-sidebar { padding: 36px 20px; }
+    .lineup-grid, .past-grid { grid-template-columns: 1fr 1fr; }
+    .how-steps { grid-template-columns: 1fr 1fr; }
+    .lineup-section, .how-section, .past-section { padding: 44px 20px; }
+    .countdown-wrap { flex-wrap: wrap; padding: 20px; }
+    footer { padding: 32px 20px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Sucré</a>
+  <div class="nav-links">
+    <a href="index.html">Overview</a>
+    <a href="index.html#shop">Online Shop</a>
+    <a href="index.html#review">Review</a>
+    <a href="event.html" class="active">Event</a>
+  </div>
+  <div class="nav-icons">
+    <a href="wishlist.html" title="찜 목록">♡</a>
+    <a href="login.html" id="navAuthBtn" class="nav-auth">로그인</a>
+  </div>
+</nav>
+
+<div class="breadcrumb">
+  <a href="index.html">Overview</a>
+  <span class="sep">›</span>
+  <span class="current">Event</span>
+</div>
+
+<!-- HERO -->
+<div class="event-hero">
+  <div class="event-badge">🎉 ONGOING EVENT</div>
+  <div class="event-title">무료 시식 이벤트<br><span style="font-style:italic;font-size:32px">Taste Sucré, Free</span></div>
+  <div class="event-sub">Sucré의 시그니처 디저트를 무료로 맛보고 솔직한 후기를 남겨주세요</div>
+  <div class="event-hero-meta">
+    <div class="ehm-item">
+      <div class="ehm-label">EVENT PERIOD</div>
+      <div class="ehm-val">2026. 07. 01 – 07. 31</div>
+    </div>
+    <div class="ehm-item">
+      <div class="ehm-label">PARTICIPANTS</div>
+      <div class="ehm-val">선착순 50명</div>
+    </div>
+    <div class="ehm-item">
+      <div class="ehm-label">REMAINING</div>
+      <div class="ehm-val" id="remainCount">23명</div>
+    </div>
+  </div>
+</div>
+
+<!-- COUNTDOWN -->
+<div class="countdown-wrap">
+  <div class="cd-label">이벤트 시작까지</div>
+  <div class="cd-box"><span class="cd-num" id="cdDays">00</span><span class="cd-unit">DAYS</span></div>
+  <div class="cd-sep">:</div>
+  <div class="cd-box"><span class="cd-num" id="cdHours">00</span><span class="cd-unit">HOURS</span></div>
+  <div class="cd-sep">:</div>
+  <div class="cd-box"><span class="cd-num" id="cdMins">00</span><span class="cd-unit">MINS</span></div>
+  <div class="cd-sep">:</div>
+  <div class="cd-box"><span class="cd-num" id="cdSecs">00</span><span class="cd-unit">SECS</span></div>
+</div>
+
+<!-- EVENT DETAIL -->
+<div class="event-detail">
+  <div class="ed-text">
+    <div class="ed-label">ABOUT THIS EVENT</div>
+    <div class="ed-title">Sucré의 맛을<br>직접 경험해보세요</div>
+    <div class="ed-body">
+      Sucré가 처음이신 분들을 위해 준비한 무료 시식 이벤트입니다. 매일 아침 직접 굽는 수제 디저트 중 하나를 무료로 맛보시고, 솔직한 후기를 남겨주시면 됩니다. 소중한 피드백은 더 맛있는 Sucré를 만드는 데 사용됩니다.
+    </div>
+    <div class="ed-items">
+      <div class="ed-item"><div class="ed-dot"></div><div class="ed-item-text">시식 메뉴 1종 무료 제공 (아래 메뉴 중 1개 선택)</div></div>
+      <div class="ed-item"><div class="ed-dot"></div><div class="ed-item-text">신규 고객 및 첫 방문 고객 대상 (1인 1회 참여)</div></div>
+      <div class="ed-item"><div class="ed-dot"></div><div class="ed-item-text">시식 후 인스타그램 또는 네이버 블로그에 후기 작성 필수</div></div>
+      <div class="ed-item"><div class="ed-dot"></div><div class="ed-item-text">후기 작성 완료 시 다음 방문 시 10% 할인 쿠폰 증정</div></div>
+      <div class="ed-item"><div class="ed-dot"></div><div class="ed-item-text">선착순 50명 한정, 조기 마감될 수 있습니다</div></div>
+    </div>
+  </div>
+  <div class="ed-img">🍰</div>
+</div>
+
+<!-- MENU LINEUP -->
+<div class="lineup-section">
+  <div class="section-title">시식 메뉴 라인업</div>
+  <div class="section-sub">아래 6가지 메뉴 중 1가지를 신청 시 선택하세요</div>
+  <div class="lineup-grid">
+    <div class="lineup-card">
+      <div class="lc-img">🍰</div>
+      <div class="lc-name">딸기 쇼트케이크</div>
+      <div class="lc-desc">신선한 국내산 딸기와 생크림 레이어. 시그니처 베스트셀러.</div>
+      <span class="lc-tag">1 Slice 무료</span>
+    </div>
+    <div class="lineup-card">
+      <div class="lc-img">🍬</div>
+      <div class="lc-name">마카롱 세트</div>
+      <div class="lc-desc">시즌 플레이버 마카롱 2개. 바삭하고 촉촉한 꼬끄.</div>
+      <span class="lc-tag">2개 무료</span>
+    </div>
+    <div class="lineup-card">
+      <div class="lc-img">🥐</div>
+      <div class="lc-name">크로플</div>
+      <div class="lc-desc">48시간 숙성 크루아상 반죽, 주문 즉시 구워드려요.</div>
+      <span class="lc-tag">Regular 1개 무료</span>
+    </div>
+    <div class="lineup-card">
+      <div class="lc-img">☕</div>
+      <div class="lc-name">시그니처 라떼</div>
+      <div class="lc-desc">에티오피아 × 콜롬비아 블렌드 라떼 (HOT/ICED).</div>
+      <span class="lc-tag">Regular 1잔 무료</span>
+    </div>
+    <div class="lineup-card">
+      <div class="lc-img">🥧</div>
+      <div class="lc-name">시즌 타르트</div>
+      <div class="lc-desc">이달의 시즌 타르트 1슬라이스. 지금은 복숭아 & 바질.</div>
+      <span class="lc-tag">1 Slice 무료</span>
+    </div>
+    <div class="lineup-card">
+      <div class="lc-img">🍞</div>
+      <div class="lc-name">피낭시에</div>
+      <div class="lc-desc">브라운 버터 전통 프랑스 구움과자. 6가지 플레이버 중 택 1.</div>
+      <span class="lc-tag">2개 무료</span>
+    </div>
+  </div>
+</div>
+
+<!-- HOW TO APPLY -->
+<div class="how-section">
+  <div class="section-title">참여 방법</div>
+  <div class="section-sub">4단계로 간단하게 신청하세요</div>
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="hs-num">01</div>
+      <div class="hs-title">신청서 작성</div>
+      <div class="hs-body">아래 신청 폼에 이름, 연락처, 희망 방문 날짜와 시식 메뉴를 선택해주세요.</div>
+    </div>
+    <div class="how-step">
+      <div class="hs-num">02</div>
+      <div class="hs-title">확인 메일 수신</div>
+      <div class="hs-body">신청 완료 후 확인 이메일이 발송됩니다. 이메일을 지참해 매장에 방문해주세요.</div>
+    </div>
+    <div class="how-step">
+      <div class="hs-num">03</div>
+      <div class="hs-title">매장 방문 & 시식</div>
+      <div class="hs-body">희망 날짜에 매장을 방문하시면 선택하신 메뉴를 무료로 제공해드립니다.</div>
+    </div>
+    <div class="how-step">
+      <div class="hs-num">04</div>
+      <div class="hs-title">후기 작성 & 쿠폰</div>
+      <div class="hs-body">SNS에 후기를 작성하고 매장에 보여주시면 10% 할인 쿠폰을 드려요!</div>
+    </div>
+  </div>
+</div>
+
+<!-- APPLY FORM + SIDEBAR -->
+<div class="apply-section">
+  <div class="apply-form-wrap">
+    <div class="apply-title">이벤트 신청하기</div>
+    <div class="apply-sub">선착순 50명 · 조기 마감 시 신청이 종료됩니다</div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>이름 *</label>
+        <input type="text" id="appName" placeholder="홍길동" required>
+      </div>
+      <div class="field">
+        <label>연락처 *</label>
+        <input type="tel" id="appPhone" placeholder="010-0000-0000" required>
+      </div>
+    </div>
+    <div class="field">
+      <label>이메일 * (확인 메일 수신)</label>
+      <input type="email" id="appEmail" placeholder="example@email.com" required>
+    </div>
+    <div class="field">
+      <label>희망 방문 날짜 *</label>
+      <input type="date" id="appDate" required>
+    </div>
+    <div class="field">
+      <label>희망 방문 시간 *</label>
+      <select id="appTime">
+        <option value="">선택해주세요</option>
+        <option>11:00 – 12:00</option>
+        <option>12:00 – 13:00</option>
+        <option>13:00 – 14:00</option>
+        <option>14:00 – 15:00</option>
+        <option>15:00 – 16:00</option>
+        <option>16:00 – 17:00</option>
+        <option>17:00 – 18:00</option>
+        <option>18:00 – 19:00</option>
+        <option>19:00 – 20:00</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>시식 메뉴 선택 *</label>
+      <select id="appMenu">
+        <option value="">선택해주세요</option>
+        <option>🍰 딸기 쇼트케이크 (1 Slice)</option>
+        <option>🍬 마카롱 세트 (2개)</option>
+        <option>🥐 크로플 (Regular 1개)</option>
+        <option>☕ 시그니처 라떼 (HOT/ICED)</option>
+        <option>🥧 시즌 타르트 — 복숭아&바질 (1 Slice)</option>
+        <option>🍞 피낭시에 (2개, 플레이버 현장 선택)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>SNS 계정 (후기 작성용)</label>
+      <input type="text" id="appSns" placeholder="인스타그램 @아이디 또는 네이버 블로그 URL">
+    </div>
+    <div class="field">
+      <label>방문 경로</label>
+      <select id="appRoute">
+        <option>인스타그램</option>
+        <option>네이버 검색</option>
+        <option>카카오맵</option>
+        <option>지인 추천</option>
+        <option>기타</option>
+      </select>
+    </div>
+
+    <button class="submit-btn" id="applyBtn" onclick="submitApply()">이벤트 신청하기</button>
+    <div class="result-msg" id="applyResult"></div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="apply-sidebar">
+    <div class="sb-block">
+      <div class="sb-label">EVENT INFO</div>
+      <div class="sb-title">이벤트 안내</div>
+      <div class="sb-row"><span class="sb-icon">📅</span><span>기간: 2026년 7월 1일 – 7월 31일</span></div>
+      <div class="sb-row"><span class="sb-icon">👥</span><span>대상: 신규 고객 및 첫 방문 고객</span></div>
+      <div class="sb-row"><span class="sb-icon">🎁</span><span>혜택: 시식 메뉴 무료 + 10% 할인 쿠폰</span></div>
+      <div class="sb-row"><span class="sb-icon">📍</span><span>장소: Sucré 매장 (충북 청주시 상당구)</span></div>
+      <div class="sb-row"><span class="sb-icon">⏱️</span><span>선착순 50명 한정</span></div>
+    </div>
+
+    <div class="sb-block">
+      <div class="sb-label">AFTER EVENT</div>
+      <div class="sb-title">참여 후 혜택</div>
+      <div class="sb-row"><span class="sb-icon">📸</span><span>SNS 후기 작성 시 다음 방문 10% 할인</span></div>
+      <div class="sb-row"><span class="sb-icon">💌</span><span>후기를 @sucre_cafe 태그하거나 매장에 URL 제시</span></div>
+      <div class="sb-row"><span class="sb-icon">🔁</span><span>쿠폰은 방문 후 30일 내 사용 가능</span></div>
+    </div>
+
+    <div class="notice-box">
+      <div class="notice-title">NOTICE</div>
+      <div class="notice-item">⚠️ &nbsp;1인 1회만 참여 가능합니다</div>
+      <div class="notice-item" style="margin-top:6px">⚠️ &nbsp;예약 날짜 변경은 방문 2일 전까지 연락주세요</div>
+      <div class="notice-item" style="margin-top:6px">⚠️ &nbsp;노쇼 시 추후 이벤트 참여가 제한될 수 있습니다</div>
+      <div class="notice-item" style="margin-top:6px">📞 &nbsp;문의: 043-000-0000</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAST EVENTS -->
+<div class="past-section">
+  <div class="section-title">지난 이벤트</div>
+  <div class="section-sub">Sucré에서 진행된 이전 이벤트들이에요</div>
+  <div class="past-grid">
+    <div class="past-card">
+      <div class="past-img" style="background:linear-gradient(145deg,#f0e8f4,#d4b8e8)">🍬</div>
+      <div class="past-body">
+        <div class="past-date">2026. 05. 01 – 05. 31</div>
+        <div class="past-name">봄맞이 마카롱 무료 시식</div>
+        <div class="past-result">총 50명 참여 완료</div>
+        <span class="past-ended">ENDED</span>
+      </div>
+    </div>
+    <div class="past-card">
+      <div class="past-img" style="background:linear-gradient(145deg,#e8f0e0,#b8d888)">🌸</div>
+      <div class="past-body">
+        <div class="past-date">2026. 04. 01 – 04. 30</div>
+        <div class="past-name">딸기 시즌 타르트 시식</div>
+        <div class="past-result">총 50명 참여 완료</div>
+        <span class="past-ended">ENDED</span>
+      </div>
+    </div>
+    <div class="past-card">
+      <div class="past-img" style="background:linear-gradient(145deg,#f5ede0,#d8c080)">🥐</div>
+      <div class="past-body">
+        <div class="past-date">2026. 03. 01 – 03. 31</div>
+        <div class="past-name">크로플 오픈 기념 시식</div>
+        <div class="past-result">총 50명 참여 완료</div>
+        <span class="past-ended">ENDED</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-biz">
+    Sucré &nbsp;|&nbsp; 대표: 홍길동 &nbsp;|&nbsp; 사업자등록번호: 000-00-00000<br>
+    주소: 충북 청주시 상당구 어딘가 123 &nbsp;|&nbsp; 고객센터: 043-000-0000
+  </div>
+  <div class="footer-links">
+    <a href="#">이용약관</a>
+    <a href="#">개인정보처리방침</a>
+  </div>
+</footer>
+
+<script>
+  emailjs.init('P_AoK29OKVR_PrqzO');
+
+  // 날짜 최소값 설정
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('appDate').setAttribute('min', today);
+
+  // 카운트다운
+  function updateCountdown() {
+    const target = new Date('2026-07-01T00:00:00');
+    const now = new Date();
+    const diff = target - now;
+    if (diff <= 0) {
+      document.querySelector('.countdown-wrap').innerHTML = '<div style="font-family:Playfair Display,serif;font-size:18px;color:#5a8a3a">🎉 이벤트가 진행 중입니다!</div>';
+      return;
+    }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('cdDays').textContent  = String(d).padStart(2,'0');
+    document.getElementById('cdHours').textContent = String(h).padStart(2,'0');
+    document.getElementById('cdMins').textContent  = String(m).padStart(2,'0');
+    document.getElementById('cdSecs').textContent  = String(s).padStart(2,'0');
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // 신청 폼 제출
+  async function submitApply() {
+    const name  = document.getElementById('appName').value.trim();
+    const phone = document.getElementById('appPhone').value.trim();
+    const email = document.getElementById('appEmail').value.trim();
+    const date  = document.getElementById('appDate').value;
+    const time  = document.getElementById('appTime').value;
+    const menu  = document.getElementById('appMenu').value;
+    const sns   = document.getElementById('appSns').value.trim();
+    const route = document.getElementById('appRoute').value;
+    const resultEl = document.getElementById('applyResult');
+    const btn = document.getElementById('applyBtn');
+
+    if (!name || !phone || !email || !date || !time || !menu) {
+      resultEl.className = 'result-msg error';
+      resultEl.textContent = '❌ 필수 항목을 모두 입력해주세요.';
+      resultEl.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '신청 중...';
+
+    try {
+      await emailjs.send('service_aorhmtg', 'template_u2duq02', {
+        to_name:   name,
+        to_email:  email,
+        phone:     phone,
+        menu_list: `[무료 시식 이벤트 신청]\n메뉴: ${menu}\n방문 날짜: ${date} ${time}\nSNS: ${sns || '미입력'}\n방문 경로: ${route}`,
+        total:     '무료 시식 이벤트',
+        delivery:  '매장 방문',
+        pickup_info: `${date} ${time}`,
+        payment:   '무료',
+        gift_wrap: '없음',
+        message:   `SNS: ${sns || '미입력'}`,
+        request:   `방문 경로: ${route}`,
+      });
+      resultEl.className = 'result-msg success';
+      resultEl.innerHTML = `🎉 신청이 완료됐어요! <strong>${email}</strong>로 확인 메일을 보내드렸어요.<br>방문 날짜를 꼭 지켜주세요 😊`;
+      resultEl.style.display = 'block';
+      btn.textContent = '신청 완료 ✓';
+      // 잔여 인원 감소 (시각적)
+      const rem = document.getElementById('remainCount');
+      const cur = parseInt(rem.textContent);
+      if (cur > 0) rem.textContent = (cur - 1) + '명';
+    } catch (e) {
+      resultEl.className = 'result-msg error';
+      resultEl.textContent = '❌ 신청에 실패했어요. 잠시 후 다시 시도해주세요.';
+      resultEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = '이벤트 신청하기';
+    }
+  }
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const app = initializeApp({
+    apiKey: "AIzaSyBl9jwmiIQnDjeobk9GBE5I0GO05ONPo6E",
+    authDomain: "sucre-cafe.firebaseapp.com",
+    projectId: "sucre-cafe",
+    storageBucket: "sucre-cafe.firebasestorage.app",
+    messagingSenderId: "1014358894897",
+    appId: "1:1014358894897:web:ce72ad3e9a8a8e95e96810"
+  });
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    const btn = document.getElementById('navAuthBtn');
+    if (user) {
+      btn.textContent = (user.displayName || user.email.split('@')[0]) + ' · 로그아웃';
+      btn.onclick = async (e) => { e.preventDefault(); await signOut(auth); location.reload(); };
+    } else {
+      btn.textContent = '로그인';
+      btn.href = 'login.html';
+    }
+  });
+</script>
+</body>
+</html>
