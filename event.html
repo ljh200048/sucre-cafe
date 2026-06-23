@@ -27,13 +27,14 @@
 
   /* HERO */
   .event-hero {
-    background: linear-gradient(150deg, #1a0f08 0%, #3a2010 35%, #6a3e20 65%, #9a6030 100%);
+    background: url('event-hero.png') center center / cover no-repeat;
     padding: 80px 40px; text-align: center; position: relative; overflow: hidden;
+    min-height: 480px; display: flex; flex-direction: column; align-items: center; justify-content: center;
   }
   .event-hero::before {
     content: '';
     position: absolute; inset: 0;
-    background: repeating-linear-gradient(45deg, transparent, transparent 32px, rgba(255,255,255,0.015) 32px, rgba(255,255,255,0.015) 33px);
+    background: rgba(0,0,0,0.45);
   }
   .event-badge { display: inline-block; font-size: 10px; letter-spacing: 0.14em; color: #d4a84a; border: 0.5px solid rgba(212,168,74,0.5); padding: 5px 16px; margin-bottom: 20px; position: relative; z-index: 1; }
   .event-title { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 400; color: #fff; line-height: 1.25; margin-bottom: 14px; position: relative; z-index: 1; }
