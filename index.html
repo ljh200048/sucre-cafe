@@ -40,7 +40,8 @@
   .hero-right { display: grid; grid-template-rows: 1fr 1fr; }
   .hero-sub { display: flex; align-items: flex-end; justify-content: flex-end; padding: 32px; position: relative; overflow: hidden; cursor: pointer; transition: opacity 0.2s; }
   .hero-sub:hover { opacity: 0.88; }
-  .hero-sub-1 { background: linear-gradient(150deg, #e8ddd0, #c8b098); }
+  .hero-sub-1 { background: url('macaron-main.png') center center / cover no-repeat; }
+  .hero-sub-1::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.2); }
   .hero-sub-2 { background: linear-gradient(150deg, #d4e8d0, #a8c898); border-top: 0.5px solid rgba(255,255,255,0.3); }
 
   .hero-title { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 400; color: #fff; line-height: 1.2; margin-bottom: 10px; position: relative; z-index: 1; }
@@ -84,7 +85,7 @@
   .pc-arrow { font-size: 12px; color: #bbb; letter-spacing: 0.06em; }
 
   .img-cake   { background: linear-gradient(145deg, #ede4d8, #c8b098); }
-  .img-macaron { background: linear-gradient(145deg, #f0e8f4, #d4b8e8); }
+  .img-macaron { background: url('macaron-main.png') center center / cover no-repeat; }
   .img-croffle { background: linear-gradient(145deg, #f5ede0, #d8c080); }
   .img-latte  { background: linear-gradient(145deg, #2c1c0c, #6a4520); }
   .img-tart   { background: linear-gradient(145deg, #e8f0e0, #b8d888); }
