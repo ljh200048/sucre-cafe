@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 위시리스트 — 본인만
+    match /wishlists/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+    // 이미지 설정 — 관리자만
+    match /settings/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == 'lch200048@gmail.com';
+    }
+    // 리뷰 — 누구나 읽기, 로그인 후 쓰기
+    match /reviews/{menuId}/items/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.uid;
+    }
+  }
+}
